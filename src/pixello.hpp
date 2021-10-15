@@ -2,34 +2,32 @@
 
 #include <inttypes.h>
 #include <string>
+#include <vector>
 
 // Forward declaration to avoid include sdl in this header
 struct SDL_Window;
 struct SDL_Renderer;
 
-// Log function prototype
-typedef void (*log_func)(const std::string &log);
-
 class pixello {
 private:
-  log_func log_callback = nullptr;
+  SDL_Window *window = NULL;
+  SDL_Renderer *renderer = NULL;
 
-  int32_t w = 640;
-  int32_t h = 480;
   uint32_t window_x = 0;
   uint32_t window_y = 0;
   std::string name;
 
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
+protected:
+  uint32_t w = 640;
+  uint32_t h = 480;
 
-  void log(const std::string &msg);
+  virtual void log(const std::string &msg) = 0;
+  virtual void on_update(std::vector<uint8_t> &pixels) = 0;
 
 public:
-  pixello(const std::string name, int32_t width, int32_t height, uint32_t x,
+  pixello(const std::string name, uint32_t width, uint32_t height, uint32_t x,
           uint32_t y);
+  ~pixello();
 
-  void set_logger(log_func log_callback);
   bool run();
-  bool close();
 };
