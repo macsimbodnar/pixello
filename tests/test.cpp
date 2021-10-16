@@ -7,7 +7,7 @@ constexpr uint32_t h = 40;
 
 class pixel : public pixello {
 public:
-  pixel() : pixello({w, h, 600, 400, 100, 100, "Test pixello"}) {}
+  pixel() : pixello({w, h, 600, 400, 100, 100, "Test pixello", 60}) {}
 
 private:
   void log(const std::string &msg) override { std::cout << msg << std::endl; }

@@ -13,6 +13,8 @@ pixello::pixello(config_t configuration) : config(std::move(configuration)) {}
 
 bool pixello::run() {
 
+  const float target_s_per_frame = 1 / config.target_fps;
+
   int res;
 
   // Initialize SDL
@@ -33,6 +35,7 @@ bool pixello::run() {
     return false;
   }
 
+  // SDL_RENDERER_PRESENTVSYNC for vsync
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
   if (renderer == NULL) {
@@ -46,12 +49,13 @@ bool pixello::run() {
 
   SDL_Event event;
   bool running = true;
-
+  uint32_t FPS_counter = 0;
+  uint64_t FPS_last_check = SDL_GetPerformanceCounter();
   /*************************************************************
    *                          MAIN LOOP                        *
    *************************************************************/
   while (running) {
-    const Uint64 start = SDL_GetPerformanceCounter();
+    const uint64_t start = SDL_GetPerformanceCounter();
 
     // POLL EVENTS
     while (SDL_PollEvent(&event)) {
@@ -70,13 +74,29 @@ bool pixello::run() {
     SDL_RenderPresent(renderer);
 
     // PERFORMANCE
-    const Uint64 end = SDL_GetPerformanceCounter();
-    const static Uint64 freq = SDL_GetPerformanceFrequency();
-    const double seconds = (end - start) / static_cast<double>(freq);
+    const uint64_t end = SDL_GetPerformanceCounter();
+    const float freq = static_cast<float>(SDL_GetPerformanceFrequency());
+    const float elapsed_s = (end - start) / freq;
+    const float sleep_for_s = target_s_per_frame - elapsed_s;
+    const uint64_t sleep_for_ms = static_cast<uint64_t>(sleep_for_s * 1000.0f);
 
-    // log("Frame time: " + std::to_string(seconds * 1000.0) + "ms");
+    // log("Sleep for: " + STR(sleep_for_ms) + "ms");
 
-    // SDL_Delay(100);
+    if (sleep_for_s > 0) {
+      SDL_Delay(sleep_for_ms);
+    }
+    //  else {
+    //   log("Frame too slow");
+    // }
+
+    const float FPS_elapsed_s = (end - FPS_last_check) / freq;
+    if (FPS_elapsed_s > 1.0f) {
+      FPS_last_check = end;
+      log("FPS: " + STR(FPS_counter));
+      FPS_counter = 0;
+    }
+
+    ++FPS_counter;
   }
 
   return true;

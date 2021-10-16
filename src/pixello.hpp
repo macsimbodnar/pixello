@@ -42,10 +42,12 @@ private:
 
     const std::string name;
 
+    float target_fps;
+
     config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh, uint32_t wx,
-             uint32_t wy, std ::string wname)
+             uint32_t wy, std ::string wname, float Hz)
         : pixels_w(pw), pixels_h(ph), window_w(ww), window_h(wh), window_x(wx),
-          window_y(wy), name(std::move(wname)) {}
+          window_y(wy), name(std::move(wname)), target_fps(Hz) {}
   };
 
   config_t config;
