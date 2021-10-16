@@ -1,14 +1,11 @@
 #pragma once
 
-#include "SDL.h"
-#include "SDL_render.h"
-
 #include <inttypes.h>
 #include <string>
 
 // Forward declaration to avoid include sdl in this header
-// struct SDL_Window;
-// struct SDL_Renderer;
+struct SDL_Window;
+struct SDL_Renderer;
 
 #define STR(_N_) std::to_string(_N_)
 
@@ -63,13 +60,6 @@ public:
   bool run();
 
   // Routines
-  inline void draw(uint32_t x, uint32_t y, pixel_t p) {
-    SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-    SDL_RenderDrawPoint(renderer, x, y);
-  }
-
-  inline void clear(pixel_t p) {
-    SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-    SDL_RenderClear(renderer);
-  }
+  void draw(uint32_t x, uint32_t y, pixel_t p);
+  void clear(pixel_t p);
 };

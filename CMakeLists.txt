@@ -13,8 +13,8 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src)
-add_subdirectory(${CMAKE_SOURCE_DIR}/3rd_parties)
+add_subdirectory(src)
+add_subdirectory(3rd_parties)
 
 enable_testing()
-add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
+add_subdirectory(tests)

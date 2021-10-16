@@ -1,4 +1,6 @@
 #include "pixello.hpp"
+#include "SDL.h"
+#include "SDL_render.h"
 
 #define CHECK(_RES_, _MSG_)                                                    \
   do {                                                                         \
@@ -110,4 +112,15 @@ pixello::~pixello() {
 
   // Quit SDL subsystems
   SDL_Quit();
+}
+
+// Routines
+void pixello::draw(uint32_t x, uint32_t y, pixel_t p) {
+  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderDrawPoint(renderer, x, y);
+}
+
+void pixello::clear(pixel_t p) {
+  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderClear(renderer);
 }
