@@ -94,9 +94,9 @@ bool pixello::run() {
       FPS_last_check = end;
       log("FPS: " + STR(FPS_counter));
       FPS_counter = 0;
+    } else {
+      ++FPS_counter;
     }
-
-    ++FPS_counter;
   }
 
   return true;
