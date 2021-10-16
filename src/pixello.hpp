@@ -1,33 +1,73 @@
 #pragma once
 
+#include "SDL.h"
+#include "SDL_render.h"
+
 #include <inttypes.h>
 #include <string>
-#include <vector>
 
 // Forward declaration to avoid include sdl in this header
-struct SDL_Window;
-struct SDL_Renderer;
+// struct SDL_Window;
+// struct SDL_Renderer;
+
+#define STR(_N_) std::to_string(_N_)
 
 class pixello {
+public:
+  struct pixel_t {
+    union {
+      uint32_t n = 0xFF000000;
+      struct {
+        uint8_t r;
+        uint8_t g;
+        uint8_t b;
+        uint8_t a;
+      };
+    };
+  };
+
 private:
   SDL_Window *window = NULL;
   SDL_Renderer *renderer = NULL;
 
-  uint32_t window_x = 0;
-  uint32_t window_y = 0;
-  std::string name;
+  struct config_t {
+    uint32_t pixels_w;
+    uint32_t pixels_h;
+
+    uint32_t window_w;
+    uint32_t window_h;
+
+    uint32_t window_x;
+    uint32_t window_y;
+
+    const std::string name;
+
+    config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh, uint32_t wx,
+             uint32_t wy, std ::string wname)
+        : pixels_w(pw), pixels_h(ph), window_w(ww), window_h(wh), window_x(wx),
+          window_y(wy), name(std::move(wname)) {}
+  };
+
+  config_t config;
 
 protected:
-  uint32_t w = 640;
-  uint32_t h = 480;
-
   virtual void log(const std::string &msg) = 0;
-  virtual void on_update(std::vector<uint8_t> &pixels) = 0;
+  virtual void on_update() = 0;
 
 public:
-  pixello(const std::string name, uint32_t width, uint32_t height, uint32_t x,
-          uint32_t y);
+  pixello(config_t configuration);
   ~pixello();
 
   bool run();
+
+  // Routines
+  inline void draw(uint32_t x, uint32_t y, pixel_t p) {
+    SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+    SDL_RenderDrawPoint(renderer, x, y);
+  }
+
+  inline void clear(pixel_t p) {
+    SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+    SDL_RenderClear(renderer);
+  }
 };
