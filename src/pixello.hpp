@@ -30,12 +30,11 @@ public:
 
 private:
   SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
   SDL_Surface *screen_surface = NULL;
 
   struct config_t {
-    uint32_t number_of_pixels_per_w;
-    uint32_t number_of_pixels_per_h;
+    int32_t pixel_w;
+    int32_t pixel_h;
 
     uint32_t window_w;
     uint32_t window_h;
@@ -47,17 +46,21 @@ private:
 
     float target_fps;
 
+    int32_t width_in_pixels;
+    int32_t height_in_pixels;
+
     config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh, uint32_t wx,
              uint32_t wy, std ::string wname, float Hz)
-        : number_of_pixels_per_w(pw), number_of_pixels_per_h(ph), window_w(ww),
-          window_h(wh), window_x(wx), window_y(wy), name(std::move(wname)),
-          target_fps(Hz) {}
+        : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh), window_x(wx),
+          window_y(wy), name(std::move(wname)), target_fps(Hz),
+          width_in_pixels(window_w / pixel_w),
+          height_in_pixels(window_h / pixel_h) {}
   };
 
   config_t config;
 
 protected:
-  virtual void log(const std::string &msg) = 0;
+  virtual void log(const std::string &msg);
   virtual void on_update() = 0;
 
 public:
@@ -67,10 +70,13 @@ public:
   bool run();
 
   // Routines
-  void draw(uint32_t x, uint32_t y, pixel_t p);
+  void draw(int32_t x, int32_t y, pixel_t p);
   void clear(pixel_t p);
 
   void draw_media(const media_t &m);
 
   media_t load_media(const std::string &path);
+
+  int32_t width_in_pixels() const { return config.width_in_pixels; }
+  int32_t height_in_pixels() const { return config.height_in_pixels; }
 };

@@ -1,28 +1,25 @@
 #include "pixello.hpp"
 #include "SDL.h"
 #include "SDL_render.h"
+#include <iostream>
 
-#define CHECK(_RES_, _MSG_)                                                    \
-  do {                                                                         \
-    int _res = (_RES_);                                                        \
-    if (_res) {                                                                \
-      log(_MSG_);                                                              \
-      return _res;                                                             \
-    }                                                                          \
-  } while (0)
+// #define CHECK(_RES_, _MSG_)                                                    \
+//   do {                                                                         \
+//     int _res = (_RES_);                                                        \
+//     if (_res) {                                                                \
+//       log(_MSG_);                                                              \
+//       return;                                                                  \
+//     }                                                                          \
+//   } while (0)
 
-pixello::pixello(config_t configuration) : config(std::move(configuration)) {}
-
-bool pixello::run() {
-
-  const float target_s_per_frame = 1 / config.target_fps;
+pixello::pixello(config_t configuration) : config(std::move(configuration)) {
 
   int res;
 
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     log("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
-    return false;
+    return;
   }
 
   // Create window
@@ -33,29 +30,20 @@ bool pixello::run() {
   if (window == NULL) {
     log("Window could not be created! SDL_Error: " +
         std::string(SDL_GetError()));
-    return false;
+    return;
   }
-
-  // SDL_RENDERER_PRESENTVSYNC for vsync
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-  if (renderer == NULL) {
-    log("Renderer could not be created! SDL_Error: " +
-        std::string(SDL_GetError()));
-    return false;
-  }
-
-  res = SDL_RenderSetLogicalSize(renderer, config.number_of_pixels_per_w,
-                                 config.number_of_pixels_per_h);
-  CHECK(res, "Failed to set renderer logical size");
 
   // Get the window renderer
   screen_surface = SDL_GetWindowSurface(window);
   if (screen_surface == NULL) {
     log("Failed to create a window surface! SDL_Error: " +
         std::string(SDL_GetError()));
-    return false;
+    return;
   }
+}
+
+bool pixello::run() {
+  const float target_s_per_frame = 1 / config.target_fps;
 
   SDL_Event event;
   bool running = true;
@@ -81,7 +69,6 @@ bool pixello::run() {
     on_update();
 
     // DRAW
-    SDL_RenderPresent(renderer);
     SDL_UpdateWindowSurface(window);
 
     // PERFORMANCE
@@ -130,26 +117,40 @@ pixello::~pixello() {
 }
 
 // Routines
-void pixello::draw(uint32_t x, uint32_t y, pixel_t p) {
-  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-  SDL_RenderDrawPoint(renderer, x, y);
+void pixello::draw(int32_t x, int32_t y, pixel_t p) {
+
+  SDL_Rect rect = {x * config.pixel_w, y * config.pixel_h, config.pixel_w,
+                   config.pixel_h};
+  SDL_FillRect(screen_surface, &rect,
+               SDL_MapRGBA(screen_surface->format, p.r, p.g, p.b, p.a));
 }
 
 void pixello::clear(pixel_t p) {
-  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-  SDL_RenderClear(renderer);
+  // SDL_RenderClear(renderer); TODO(max): implement render
 }
 
 pixello::media_t pixello::load_media(const std::string &path) {
 
   media_t media;
 
-  media.pointer = SDL_LoadBMP(path.c_str());
+  SDL_Surface *buffer = SDL_LoadBMP(path.c_str());
 
-  if (media.pointer == NULL) {
+  if (buffer == NULL) {
     log("Unable to load image " + path +
         "! SDL Error: " + std::string(SDL_GetError()));
+    // TODO(max): return with error or exception
   }
+
+  // Optimize the surface
+  media.pointer = SDL_ConvertSurface(buffer, screen_surface->format, 0);
+  if (media.pointer == NULL) {
+    log("Unable to optimize image " + path +
+        "! SDL Error: " + std::string(SDL_GetError()));
+    // TODO(max): return with error or exception
+  }
+
+  // Get rid of old loaded surface
+  SDL_FreeSurface(buffer);
 
   return media;
 }
@@ -157,3 +158,5 @@ pixello::media_t pixello::load_media(const std::string &path) {
 void pixello::draw_media(const pixello::media_t &m) {
   SDL_BlitSurface(m.pointer, NULL, screen_surface, NULL);
 }
+
+void pixello::log(const std::string &msg) { std::cout << msg << std::endl; }
