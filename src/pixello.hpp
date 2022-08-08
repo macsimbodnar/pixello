@@ -6,6 +6,7 @@
 // Forward declaration to avoid include sdl in this header
 struct SDL_Window;
 struct SDL_Renderer;
+struct SDL_Surface;
 
 #define STR(_N_) std::to_string(_N_)
 
@@ -23,13 +24,18 @@ public:
     };
   };
 
+  struct media_t {
+    SDL_Surface *pointer;
+  };
+
 private:
   SDL_Window *window = NULL;
   SDL_Renderer *renderer = NULL;
+  SDL_Surface *screen_surface = NULL;
 
   struct config_t {
-    uint32_t pixels_w;
-    uint32_t pixels_h;
+    uint32_t number_of_pixels_per_w;
+    uint32_t number_of_pixels_per_h;
 
     uint32_t window_w;
     uint32_t window_h;
@@ -43,8 +49,9 @@ private:
 
     config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh, uint32_t wx,
              uint32_t wy, std ::string wname, float Hz)
-        : pixels_w(pw), pixels_h(ph), window_w(ww), window_h(wh), window_x(wx),
-          window_y(wy), name(std::move(wname)), target_fps(Hz) {}
+        : number_of_pixels_per_w(pw), number_of_pixels_per_h(ph), window_w(ww),
+          window_h(wh), window_x(wx), window_y(wy), name(std::move(wname)),
+          target_fps(Hz) {}
   };
 
   config_t config;
@@ -62,4 +69,8 @@ public:
   // Routines
   void draw(uint32_t x, uint32_t y, pixel_t p);
   void clear(pixel_t p);
+
+  void draw_media(const media_t &m);
+
+  media_t load_media(const std::string &path);
 };

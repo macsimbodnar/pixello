@@ -21,8 +21,7 @@ bool pixello::run() {
 
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-    log("SDL could not initialize! SDL_Error: %s\n" +
-        std::string(SDL_GetError()));
+    log("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
     return false;
   }
 
@@ -32,7 +31,7 @@ bool pixello::run() {
                        config.window_w, config.window_h, SDL_WINDOW_SHOWN);
 
   if (window == NULL) {
-    log("Window could not be created! SDL_Error: %s\n" +
+    log("Window could not be created! SDL_Error: " +
         std::string(SDL_GetError()));
     return false;
   }
@@ -41,13 +40,22 @@ bool pixello::run() {
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
   if (renderer == NULL) {
-    log("Renderer could not be created! SDL_Error: %s\n" +
+    log("Renderer could not be created! SDL_Error: " +
         std::string(SDL_GetError()));
     return false;
   }
 
-  res = SDL_RenderSetLogicalSize(renderer, config.pixels_w, config.pixels_h);
+  res = SDL_RenderSetLogicalSize(renderer, config.number_of_pixels_per_w,
+                                 config.number_of_pixels_per_h);
   CHECK(res, "Failed to set renderer logical size");
+
+  // Get the window renderer
+  screen_surface = SDL_GetWindowSurface(window);
+  if (screen_surface == NULL) {
+    log("Failed to create a window surface! SDL_Error: " +
+        std::string(SDL_GetError()));
+    return false;
+  }
 
   SDL_Event event;
   bool running = true;
@@ -74,6 +82,7 @@ bool pixello::run() {
 
     // DRAW
     SDL_RenderPresent(renderer);
+    SDL_UpdateWindowSurface(window);
 
     // PERFORMANCE
     const uint64_t end = SDL_GetPerformanceCounter();
@@ -105,6 +114,12 @@ bool pixello::run() {
 }
 
 pixello::~pixello() {
+
+  // dealloc surface
+  if (screen_surface) {
+    SDL_FreeSurface(screen_surface);
+  }
+
   // Destroy window
   if (window) {
     SDL_DestroyWindow(window);
@@ -123,4 +138,22 @@ void pixello::draw(uint32_t x, uint32_t y, pixel_t p) {
 void pixello::clear(pixel_t p) {
   SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
   SDL_RenderClear(renderer);
+}
+
+pixello::media_t pixello::load_media(const std::string &path) {
+
+  media_t media;
+
+  media.pointer = SDL_LoadBMP(path.c_str());
+
+  if (media.pointer == NULL) {
+    log("Unable to load image " + path +
+        "! SDL Error: " + std::string(SDL_GetError()));
+  }
+
+  return media;
+}
+
+void pixello::draw_media(const pixello::media_t &m) {
+  SDL_BlitSurface(m.pointer, NULL, screen_surface, NULL);
 }

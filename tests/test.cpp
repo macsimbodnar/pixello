@@ -4,6 +4,7 @@
 
 constexpr uint32_t w = 60;
 constexpr uint32_t h = 40;
+pixello::media_t media;
 
 class pixel : public pixello {
 public:
@@ -50,11 +51,19 @@ private:
     p.g = 0;
     p.b = 255;
     draw(0, h - 1, p); // bottom left purple
+
+    draw_media(media);
   }
 };
 
 int main() {
   pixel p;
+
+  media = p.load_media("");
+
+  if (media.pointer == NULL) {
+    return 1;
+  }
 
   p.run();
 
