@@ -28,10 +28,16 @@ bool pixello::run() {
     return false;
   }
 
+  // Set texture filtering to linear
+  if (SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1") == false) {
+    log("Failed to setup the renderer: " + std::string(SDL_GetError()));
+    return false;
+  }
+
   // Create window
-  window =
-      SDL_CreateWindow(config.name.c_str(), config.window_x, config.window_y,
-                       config.window_w, config.window_h, SDL_WINDOW_SHOWN);
+  window = SDL_CreateWindow(config.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
+                            SDL_WINDOWPOS_UNDEFINED, config.window_w,
+                            config.window_h, SDL_WINDOW_SHOWN);
 
   if (window == NULL) {
     log("Window could not be created! SDL_Error: " +
@@ -72,6 +78,9 @@ bool pixello::run() {
         break;
       }
     }
+
+    // Reset the viewport to entire window
+    SDL_RenderSetViewport(renderer, NULL);
 
     // USER UPDATE
     on_update();
@@ -144,7 +153,7 @@ pixello::texture_t pixello::load_texture(const std::string &path) {
 
   if (media.pointer == NULL) {
     log("Unable to load image to texture: " + path +
-        "! SDL Error: " + std::string(SDL_GetError()));
+        "! SDL Error: " + std::string(IMG_GetError()));
     // TODO(max): return with error or exception
   }
 
@@ -153,4 +162,14 @@ pixello::texture_t pixello::load_texture(const std::string &path) {
 
 void pixello::draw_texture(const pixello::texture_t &m) {
   SDL_RenderCopy(renderer, m.pointer, NULL, NULL);
+}
+
+void pixello::set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h) {
+
+  SDL_Rect rect;
+  rect.x = x;
+  rect.y = y;
+  rect.w = w;
+  rect.h = h;
+  SDL_RenderSetViewport(renderer, &rect);
 }

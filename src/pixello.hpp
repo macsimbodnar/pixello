@@ -39,9 +39,6 @@ private:
     uint32_t window_w;
     uint32_t window_h;
 
-    uint32_t window_x;
-    uint32_t window_y;
-
     const std::string name;
 
     float target_fps;
@@ -50,10 +47,10 @@ private:
     int32_t width_in_pixels;
     int32_t height_in_pixels;
 
-    config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh, uint32_t wx,
-             uint32_t wy, std ::string wname, float Hz)
-        : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh), window_x(wx),
-          window_y(wy), name(std::move(wname)), target_fps(Hz),
+    config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh,
+             std ::string wname, float Hz)
+        : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh),
+          name(std::move(wname)), target_fps(Hz),
           target_s_per_frame(1 / target_fps),
           width_in_pixels(window_w / pixel_w),
           height_in_pixels(window_h / pixel_h) {}
@@ -79,6 +76,8 @@ public:
   void draw_texture(const texture_t &m);
   texture_t load_texture(const std::string &path);
 
-  int32_t width_in_pixels() const { return config.width_in_pixels; }
-  int32_t height_in_pixels() const { return config.height_in_pixels; }
+  inline int32_t width_in_pixels() const { return config.width_in_pixels; }
+  inline int32_t height_in_pixels() const { return config.height_in_pixels; }
+
+  void set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
 };
