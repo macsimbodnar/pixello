@@ -1,6 +1,7 @@
 #pragma once
 
 #include <inttypes.h>
+#include <memory>
 #include <string>
 
 // Forward declaration to avoid include sdl in this header
@@ -24,13 +25,38 @@ public:
     };
   };
 
-  struct texture_t {
-    SDL_Texture *pointer;
+  class texture {
+    friend pixello;
+
+  private:
+    class sdl_texture_wrapper {
+    public:
+      SDL_Texture *ptr = NULL;
+
+      sdl_texture_wrapper(SDL_Texture *p) : ptr(p) {}
+      ~sdl_texture_wrapper();
+    };
+
+    int32_t w = 0;
+    int32_t h = 0;
+
+    std::shared_ptr<sdl_texture_wrapper> ptr;
+
+  protected:
+    texture(pixello *p, const std::string &path);
+    inline SDL_Texture *pointer() const { return ptr.get()->ptr; }
+
+  public:
+    texture() {}
+
+    void render(int32_t x, int32_t y);
+
+    inline int32_t width() const { return w; };
+    inline int32_t height() const { return h; };
   };
 
 private:
   SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
 
   struct config_t {
     int32_t pixel_w;
@@ -59,6 +85,7 @@ private:
   config_t config;
 
 protected:
+  SDL_Renderer *renderer = NULL;
   virtual void log(const std::string &msg) = 0;
   virtual void on_update() = 0;
   virtual void on_init() = 0;
@@ -73,8 +100,11 @@ public:
   void draw(int32_t x, int32_t y, pixel_t p);
   void clear(pixel_t p);
 
-  void draw_texture(const texture_t &m);
-  texture_t load_texture(const std::string &path);
+  void draw_texture(const texture &m, int32_t x, int32_t y, int32_t w,
+                    int32_t h);
+  void draw_texture(const texture &m, int32_t x, int32_t y);
+
+  texture load_texture(const std::string &path);
 
   inline int32_t width_in_pixels() const { return config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return config.height_in_pixels; }

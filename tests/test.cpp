@@ -2,7 +2,8 @@
 #include <iostream>
 #include <vector>
 
-pixello::texture_t media;
+pixello::texture media1;
+pixello::texture media2;
 
 class pixel : public pixello {
 public:
@@ -11,11 +12,13 @@ public:
 private:
   void log(const std::string &msg) override { std::cout << msg << std::endl; }
 
-  void on_init() override { media = load_texture("assets/sample_640x426.bmp"); }
+  void on_init() override {
+    media1 = load_texture("assets/sample_640x426.bmp");
+    media2 = load_texture("assets/Chess_klt60.png");
+  }
 
   void on_update() override {
     clear({0xFF000000});
-
 
     for (uint32_t i = 0; i < 1000; i++) {
       const uint32_t x = (rand() % (width_in_pixels() - 2)) + 1;
@@ -54,7 +57,8 @@ private:
     draw(0, height_in_pixels() - 1, p); // bottom left purple
 
     set_current_viewport(0, 0, 320, 213);
-    draw_texture(media);
+    draw_texture(media1, 10, 10, 300, 193);
+    draw_texture(media2, 0, 0);
   }
 };
 

@@ -145,31 +145,49 @@ void pixello::clear(pixel_t p) {
   SDL_RenderClear(renderer);
 }
 
-pixello::texture_t pixello::load_texture(const std::string &path) {
+void pixello::draw_texture(const pixello::texture &t, int32_t x, int32_t y,
+                           int32_t w, int32_t h) {
 
-  texture_t media;
-
-  media.pointer = IMG_LoadTexture(renderer, path.c_str());
-
-  if (media.pointer == NULL) {
-    log("Unable to load image to texture: " + path +
-        "! SDL Error: " + std::string(IMG_GetError()));
-    // TODO(max): return with error or exception
-  }
-
-  return media;
+  SDL_Rect rect = {x, y, w, h};
+  SDL_RenderCopy(renderer, t.pointer(), NULL, &rect);
 }
 
-void pixello::draw_texture(const pixello::texture_t &m) {
-  SDL_RenderCopy(renderer, m.pointer, NULL, NULL);
+void pixello::draw_texture(const texture &m, int32_t x, int32_t y) {
+  draw_texture(m, x, y, m.width(), m.height());
 }
 
 void pixello::set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h) {
 
-  SDL_Rect rect;
-  rect.x = x;
-  rect.y = y;
-  rect.w = w;
-  rect.h = h;
+  // Set viewport
+  SDL_Rect rect = {x, y, w, h};
   SDL_RenderSetViewport(renderer, &rect);
+
+  // Set background color for view port
+  SDL_Rect rect2 = {0, 0, w, h};
+  SDL_SetRenderDrawColor(renderer, 0x55, 0x55, 0x55, 0xFF);
+  SDL_RenderFillRect(renderer, &rect2);
+}
+
+pixello::texture::texture(pixello *p, const std::string &path) {
+
+  ptr = std::make_shared<sdl_texture_wrapper>(
+      IMG_LoadTexture(p->renderer, path.c_str()));
+
+  if (ptr == NULL) {
+    p->log("Unable to load image to texture: " + path +
+           "! SDL Error: " + std::string(IMG_GetError()));
+    // TODO(max): return with error or exception
+  }
+
+  SDL_QueryTexture(ptr.get()->ptr, NULL, NULL, &w, &h);
+}
+
+pixello::texture::sdl_texture_wrapper::~sdl_texture_wrapper() {
+  if (ptr) {
+    SDL_DestroyTexture(ptr);
+  }
+}
+
+pixello::texture pixello::load_texture(const std::string &path) {
+  return texture(this, path);
 }
