@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
+#include "SDL_ttf.h"
 #include <iostream>
 
 // #define CHECK(_RES_, _MSG_)                                                    \
@@ -34,6 +35,20 @@ bool pixello::run() {
     return false;
   }
 
+  // Init SDL IMG
+  if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+    log("SDL_image could not initialize! SDL_image Error: " +
+        std::string(IMG_GetError()));
+    return false;
+  }
+
+  // Initialize SDL_ttf
+  if (TTF_Init() == -1) {
+    log("SDL_ttf could not initialize! SDL_ttf Error: " +
+        std::string(TTF_GetError()));
+    return false;
+  }
+
   // Create window
   window = SDL_CreateWindow(config.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
                             SDL_WINDOWPOS_UNDEFINED, config.window_w,
@@ -46,11 +61,23 @@ bool pixello::run() {
   }
 
   // Get the window renderer
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  renderer = SDL_CreateRenderer(
+      window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
   if (renderer == NULL) {
     log("Failed to create a window renderer! SDL_Error: " +
         std::string(SDL_GetError()));
     return false;
+  }
+
+  // Load the font id required
+  if (config.font_path.empty() == false) {
+    font = TTF_OpenFont(config.font_path.c_str(), 28);
+
+    if (font == NULL) {
+      log("Failed to load the font! SDL_Error: " + std::string(TTF_GetError()));
+      return false;
+    }
   }
 
   // Initialize renderer color
@@ -119,6 +146,10 @@ bool pixello::run() {
 
 pixello::~pixello() {
 
+  if (font) {
+    TTF_CloseFont(font);
+  }
+
   if (renderer) {
     SDL_DestroyRenderer(renderer);
   }
@@ -152,8 +183,18 @@ void pixello::draw_texture(const pixello::texture &t, int32_t x, int32_t y,
   SDL_RenderCopy(renderer, t.pointer(), NULL, &rect);
 }
 
-void pixello::draw_texture(const texture &m, int32_t x, int32_t y) {
-  draw_texture(m, x, y, m.width(), m.height());
+void pixello::draw_texture(const texture &t, int32_t x, int32_t y) {
+  draw_texture(t, x, y, t.width(), t.height());
+}
+
+void pixello::draw_text(const text &t, int32_t x, int32_t y, int32_t w,
+                        int32_t h) {
+  SDL_Rect rect = {x, y, w, h};
+  SDL_RenderCopy(renderer, t.pointer(), NULL, &rect);
+}
+
+void pixello::draw_text(const text &t, int32_t x, int32_t y) {
+  draw_text(t, x, y, t.width(), t.height());
 }
 
 void pixello::set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h) {
@@ -182,7 +223,7 @@ pixello::texture::texture(pixello *p, const std::string &path) {
   SDL_QueryTexture(ptr.get()->ptr, NULL, NULL, &w, &h);
 }
 
-pixello::texture::sdl_texture_wrapper::~sdl_texture_wrapper() {
+pixello::sdl_texture_wrapper::~sdl_texture_wrapper() {
   if (ptr) {
     SDL_DestroyTexture(ptr);
   }
@@ -190,4 +231,39 @@ pixello::texture::sdl_texture_wrapper::~sdl_texture_wrapper() {
 
 pixello::texture pixello::load_texture(const std::string &path) {
   return texture(this, path);
+}
+
+pixello::text pixello::create_text(const std::string &t, pixel_t color) {
+  return text(this, t, color);
+}
+
+pixello::text::text(pixello *p, const std::string &text, pixel_t color) {
+  SDL_Color c = {color.r, color.g, color.b, color.a};
+
+  // Render text surface
+  SDL_Surface *txt_surface = TTF_RenderText_Solid(p->font, text.c_str(), c);
+
+  if (txt_surface == NULL) {
+    p->log("Failed to generate the text surface: " + text +
+           " Error: " + std::string(TTF_GetError()));
+    return;
+  }
+
+  // Create texture from surface pixels
+  ptr = std::make_shared<sdl_texture_wrapper>(
+      SDL_CreateTextureFromSurface(p->renderer, txt_surface));
+
+  if (ptr == NULL) {
+    p->log("Failed to generate the text texture: " + text +
+           " Error: " + std::string(TTF_GetError()));
+
+    // Free the surface in any case
+    SDL_FreeSurface(txt_surface);
+  }
+  // Get image dimensions
+  w = txt_surface->w;
+  h = txt_surface->h;
+
+  // Get rid of old surface
+  SDL_FreeSurface(txt_surface);
 }

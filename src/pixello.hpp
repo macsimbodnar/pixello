@@ -8,10 +8,21 @@
 struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
+struct _TTF_Font;
 
 #define STR(_N_) std::to_string(_N_)
 
 class pixello {
+
+private:
+  class sdl_texture_wrapper {
+  public:
+    SDL_Texture *ptr = NULL;
+
+    sdl_texture_wrapper(SDL_Texture *p) : ptr(p) {}
+    ~sdl_texture_wrapper();
+  };
+
 public:
   struct pixel_t {
     union {
@@ -29,14 +40,6 @@ public:
     friend pixello;
 
   private:
-    class sdl_texture_wrapper {
-    public:
-      SDL_Texture *ptr = NULL;
-
-      sdl_texture_wrapper(SDL_Texture *p) : ptr(p) {}
-      ~sdl_texture_wrapper();
-    };
-
     int32_t w = 0;
     int32_t h = 0;
 
@@ -49,7 +52,25 @@ public:
   public:
     texture() {}
 
-    void render(int32_t x, int32_t y);
+    inline int32_t width() const { return w; };
+    inline int32_t height() const { return h; };
+  };
+
+  class text {
+    friend pixello;
+
+  private:
+    int32_t w = 0;
+    int32_t h = 0;
+
+    std::shared_ptr<sdl_texture_wrapper> ptr;
+
+  protected:
+    text(pixello *p, const std::string &text, pixel_t color);
+    inline SDL_Texture *pointer() const { return ptr.get()->ptr; }
+
+  public:
+    text() {}
 
     inline int32_t width() const { return w; };
     inline int32_t height() const { return h; };
@@ -57,6 +78,8 @@ public:
 
 private:
   SDL_Window *window = NULL;
+  SDL_Renderer *renderer = NULL;
+  _TTF_Font *font = NULL;
 
   struct config_t {
     int32_t pixel_w;
@@ -73,19 +96,20 @@ private:
     int32_t width_in_pixels;
     int32_t height_in_pixels;
 
+    std::string font_path;
+
     config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh,
-             std ::string wname, float Hz)
+             std ::string wname, float Hz, std::string font)
         : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh),
           name(std::move(wname)), target_fps(Hz),
           target_s_per_frame(1 / target_fps),
           width_in_pixels(window_w / pixel_w),
-          height_in_pixels(window_h / pixel_h) {}
+          height_in_pixels(window_h / pixel_h), font_path(std::move(font)) {}
   };
 
   config_t config;
 
 protected:
-  SDL_Renderer *renderer = NULL;
   virtual void log(const std::string &msg) = 0;
   virtual void on_update() = 0;
   virtual void on_init() = 0;
@@ -100,11 +124,15 @@ public:
   void draw(int32_t x, int32_t y, pixel_t p);
   void clear(pixel_t p);
 
-  void draw_texture(const texture &m, int32_t x, int32_t y, int32_t w,
+  void draw_texture(const texture &t, int32_t x, int32_t y, int32_t w,
                     int32_t h);
-  void draw_texture(const texture &m, int32_t x, int32_t y);
+  void draw_texture(const texture &t, int32_t x, int32_t y);
+
+  void draw_text(const text &t, int32_t x, int32_t y, int32_t w, int32_t h);
+  void draw_text(const text &t, int32_t x, int32_t y);
 
   texture load_texture(const std::string &path);
+  text create_text(const std::string &t, pixel_t color);
 
   inline int32_t width_in_pixels() const { return config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return config.height_in_pixels; }
