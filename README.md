@@ -35,8 +35,6 @@ brew install sdl2 sdl2_image
 
 ## How to compile
 
-### Ubuntu
-
 ```bash
 # Clone the repo into you workspace
 git clone git@github.com:macsimbodnar/pixello.git
