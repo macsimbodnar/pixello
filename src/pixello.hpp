@@ -45,6 +45,7 @@ private:
     const std::string name;
 
     float target_fps;
+    float target_s_per_frame;
 
     int32_t width_in_pixels;
     int32_t height_in_pixels;
@@ -53,6 +54,7 @@ private:
              uint32_t wy, std ::string wname, float Hz)
         : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh), window_x(wx),
           window_y(wy), name(std::move(wname)), target_fps(Hz),
+          target_s_per_frame(1 / target_fps),
           width_in_pixels(window_w / pixel_w),
           height_in_pixels(window_h / pixel_h) {}
   };
@@ -60,8 +62,9 @@ private:
   config_t config;
 
 protected:
-  virtual void log(const std::string &msg);
+  virtual void log(const std::string &msg) = 0;
   virtual void on_update() = 0;
+  virtual void on_init() = 0;
 
 public:
   pixello(config_t configuration);

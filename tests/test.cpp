@@ -11,6 +11,8 @@ public:
 private:
   void log(const std::string &msg) override { std::cout << msg << std::endl; }
 
+  void on_init() override { media = load_texture("assets/sample_640x426.bmp"); }
+
   void on_update() override {
     clear({0xFF000000});
     draw_texture(media);
@@ -55,12 +57,6 @@ private:
 
 int main() {
   pixel p;
-
-  media = p.load_texture("assets/sample_640x426.bmp");
-
-  if (media.pointer == NULL) {
-    return 1;
-  }
 
   p.run();
 

@@ -13,14 +13,19 @@
 //     }                                                                          \
 //   } while (0)
 
-pixello::pixello(config_t configuration) : config(std::move(configuration)) {
+pixello::pixello(config_t configuration) : config(std::move(configuration)) {}
 
+bool pixello::run() {
+
+  /*************************************************************
+   *                          INITIALIZATION                   *
+   *************************************************************/
   int res;
 
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     log("SDL could not initialize! SDL_Error: " + std::string(SDL_GetError()));
-    return;
+    return false;
   }
 
   // Create window
@@ -31,7 +36,7 @@ pixello::pixello(config_t configuration) : config(std::move(configuration)) {
   if (window == NULL) {
     log("Window could not be created! SDL_Error: " +
         std::string(SDL_GetError()));
-    return;
+    return false;
   }
 
   // Get the window renderer
@@ -39,15 +44,14 @@ pixello::pixello(config_t configuration) : config(std::move(configuration)) {
   if (renderer == NULL) {
     log("Failed to create a window renderer! SDL_Error: " +
         std::string(SDL_GetError()));
-    return;
+    return false;
   }
 
   // Initialize renderer color
   SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-}
 
-bool pixello::run() {
-  const float target_s_per_frame = 1 / config.target_fps;
+  // CALL THE USER INIT
+  on_init();
 
   SDL_Event event;
   bool running = true;
@@ -79,7 +83,7 @@ bool pixello::run() {
     const uint64_t end = SDL_GetPerformanceCounter();
     const float freq = static_cast<float>(SDL_GetPerformanceFrequency());
     const float elapsed_s = (end - start) / freq;
-    const float sleep_for_s = target_s_per_frame - elapsed_s;
+    const float sleep_for_s = config.target_s_per_frame - elapsed_s;
     const uint64_t sleep_for_ms = static_cast<uint64_t>(sleep_for_s * 1000.0f);
 
     // log("Sleep for: " + STR(sleep_for_ms) + "ms");
@@ -150,5 +154,3 @@ pixello::texture_t pixello::load_texture(const std::string &path) {
 void pixello::draw_texture(const pixello::texture_t &m) {
   SDL_RenderCopy(renderer, m.pointer, NULL, NULL);
 }
-
-void pixello::log(const std::string &msg) { std::cout << msg << std::endl; }
