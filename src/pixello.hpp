@@ -97,14 +97,16 @@ private:
     int32_t height_in_pixels;
 
     std::string font_path;
+    int32_t font_size;
 
     config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh,
-             std ::string wname, float Hz, std::string font)
+             std ::string wname, float Hz, std::string font, int32_t font_s)
         : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh),
           name(std::move(wname)), target_fps(Hz),
           target_s_per_frame(1 / target_fps),
           width_in_pixels(window_w / pixel_w),
-          height_in_pixels(window_h / pixel_h), font_path(std::move(font)) {}
+          height_in_pixels(window_h / pixel_h), font_path(std::move(font)),
+          font_size(font_s) {}
   };
 
   config_t config;

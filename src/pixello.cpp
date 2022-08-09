@@ -72,7 +72,7 @@ bool pixello::run() {
 
   // Load the font id required
   if (config.font_path.empty() == false) {
-    font = TTF_OpenFont(config.font_path.c_str(), 28);
+    font = TTF_OpenFont(config.font_path.c_str(), config.font_size);
 
     if (font == NULL) {
       log("Failed to load the font! SDL_Error: " + std::string(TTF_GetError()));

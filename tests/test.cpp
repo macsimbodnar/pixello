@@ -9,7 +9,7 @@ class pixel : public pixello {
 public:
   pixel()
       : pixello({5, 5, 800, 800, "Test pixello", 60,
-                 "assets/font/PressStart2P.ttf"}) {}
+                 "assets/font/PressStart2P.ttf", 10}) {}
 
 private:
   void log(const std::string &msg) override { std::cout << msg << std::endl; }
@@ -58,16 +58,19 @@ private:
     p.b = 255;
     draw(0, height_in_pixels() - 1, p); // bottom left purple
 
+    // Draw texture with transparency
+    draw_texture(media2, (800 / 2) - (media2.width() / 2),
+                 (800 / 2) - (media2.height() / 2));
+
     // View port, Images
     set_current_viewport(0, 0, 320, 213);
     draw_texture(media1, 10, 10, 300, 193);
-    draw_texture(media2, 0, 0);
 
     // Text
     set_current_viewport(800 - 320, 800 - 213, 320, 213);
     p.n = 0xFF0000FF;
     text text1 = create_text("Hello world!!!!", p);
-    draw_text(text1, 20, 100, text1.width() / 2, text1.height() / 2);
+    draw_text(text1, 20, 100);
   }
 };
 
