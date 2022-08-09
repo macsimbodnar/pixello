@@ -6,7 +6,7 @@
 // Forward declaration to avoid include sdl in this header
 struct SDL_Window;
 struct SDL_Renderer;
-struct SDL_Surface;
+struct SDL_Texture;
 
 #define STR(_N_) std::to_string(_N_)
 
@@ -24,13 +24,13 @@ public:
     };
   };
 
-  struct media_t {
-    SDL_Surface *pointer;
+  struct texture_t {
+    SDL_Texture *pointer;
   };
 
 private:
   SDL_Window *window = NULL;
-  SDL_Surface *screen_surface = NULL;
+  SDL_Renderer *renderer = NULL;
 
   struct config_t {
     int32_t pixel_w;
@@ -73,9 +73,8 @@ public:
   void draw(int32_t x, int32_t y, pixel_t p);
   void clear(pixel_t p);
 
-  void draw_media(const media_t &m);
-
-  media_t load_media(const std::string &path);
+  void draw_texture(const texture_t &m);
+  texture_t load_texture(const std::string &path);
 
   int32_t width_in_pixels() const { return config.width_in_pixels; }
   int32_t height_in_pixels() const { return config.height_in_pixels; }

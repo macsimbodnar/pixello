@@ -1,5 +1,6 @@
 #include "pixello.hpp"
 #include "SDL.h"
+#include "SDL_image.h"
 #include "SDL_render.h"
 #include <iostream>
 
@@ -34,12 +35,15 @@ pixello::pixello(config_t configuration) : config(std::move(configuration)) {
   }
 
   // Get the window renderer
-  screen_surface = SDL_GetWindowSurface(window);
-  if (screen_surface == NULL) {
-    log("Failed to create a window surface! SDL_Error: " +
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  if (renderer == NULL) {
+    log("Failed to create a window renderer! SDL_Error: " +
         std::string(SDL_GetError()));
     return;
   }
+
+  // Initialize renderer color
+  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
 
 bool pixello::run() {
@@ -69,7 +73,7 @@ bool pixello::run() {
     on_update();
 
     // DRAW
-    SDL_UpdateWindowSurface(window);
+    SDL_RenderPresent(renderer);
 
     // PERFORMANCE
     const uint64_t end = SDL_GetPerformanceCounter();
@@ -102,17 +106,14 @@ bool pixello::run() {
 
 pixello::~pixello() {
 
-  // dealloc surface
-  if (screen_surface) {
-    SDL_FreeSurface(screen_surface);
+  if (renderer) {
+    SDL_DestroyRenderer(renderer);
   }
 
-  // Destroy window
   if (window) {
     SDL_DestroyWindow(window);
   }
 
-  // Quit SDL subsystems
   SDL_Quit();
 }
 
@@ -121,42 +122,33 @@ void pixello::draw(int32_t x, int32_t y, pixel_t p) {
 
   SDL_Rect rect = {x * config.pixel_w, y * config.pixel_h, config.pixel_w,
                    config.pixel_h};
-  SDL_FillRect(screen_surface, &rect,
-               SDL_MapRGBA(screen_surface->format, p.r, p.g, p.b, p.a));
+
+  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderFillRect(renderer, &rect);
 }
 
 void pixello::clear(pixel_t p) {
-  // SDL_RenderClear(renderer); TODO(max): implement render
+  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderClear(renderer);
 }
 
-pixello::media_t pixello::load_media(const std::string &path) {
+pixello::texture_t pixello::load_texture(const std::string &path) {
 
-  media_t media;
+  texture_t media;
 
-  SDL_Surface *buffer = SDL_LoadBMP(path.c_str());
+  media.pointer = IMG_LoadTexture(renderer, path.c_str());
 
-  if (buffer == NULL) {
-    log("Unable to load image " + path +
-        "! SDL Error: " + std::string(SDL_GetError()));
-    // TODO(max): return with error or exception
-  }
-
-  // Optimize the surface
-  media.pointer = SDL_ConvertSurface(buffer, screen_surface->format, 0);
   if (media.pointer == NULL) {
-    log("Unable to optimize image " + path +
+    log("Unable to load image to texture: " + path +
         "! SDL Error: " + std::string(SDL_GetError()));
     // TODO(max): return with error or exception
   }
-
-  // Get rid of old loaded surface
-  SDL_FreeSurface(buffer);
 
   return media;
 }
 
-void pixello::draw_media(const pixello::media_t &m) {
-  SDL_BlitSurface(m.pointer, NULL, screen_surface, NULL);
+void pixello::draw_texture(const pixello::texture_t &m) {
+  SDL_RenderCopy(renderer, m.pointer, NULL, NULL);
 }
 
 void pixello::log(const std::string &msg) { std::cout << msg << std::endl; }

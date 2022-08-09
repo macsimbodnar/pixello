@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-pixello::media_t media;
+pixello::texture_t media;
 
 class pixel : public pixello {
 public:
@@ -12,7 +12,8 @@ private:
   void log(const std::string &msg) override { std::cout << msg << std::endl; }
 
   void on_update() override {
-    // clear({0xFF000000});
+    clear({0xFF000000});
+    draw_texture(media);
 
     for (uint32_t i = 0; i < 1000; i++) {
       const uint32_t x = (rand() % (width_in_pixels() - 2)) + 1;
@@ -49,15 +50,13 @@ private:
     p.g = 0;
     p.b = 255;
     draw(0, height_in_pixels() - 1, p); // bottom left purple
-
-    // draw_media(media);
   }
 };
 
 int main() {
   pixel p;
 
-  media = p.load_media("assets/sample_640x426.bmp");
+  media = p.load_texture("assets/sample_640x426.bmp");
 
   if (media.pointer == NULL) {
     return 1;
