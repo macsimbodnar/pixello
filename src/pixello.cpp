@@ -23,9 +23,9 @@ sdl_texture_wrapper_t::~sdl_texture_wrapper_t()
 
 pixello::~pixello()
 {
-  if (font) { TTF_CloseFont(font); }
-  if (renderer) { SDL_DestroyRenderer(renderer); }
-  if (window) { SDL_DestroyWindow(window); }
+  if (_font) { TTF_CloseFont(_font); }
+  if (_renderer) { SDL_DestroyRenderer(_renderer); }
+  if (_window) { SDL_DestroyWindow(_window); }
 
   SDL_Quit();
 }
@@ -60,36 +60,39 @@ void pixello::init()
   }
 
   // Create window
-  window = SDL_CreateWindow(config.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
-                            SDL_WINDOWPOS_UNDEFINED, config.window_w,
-                            config.window_h, SDL_WINDOW_SHOWN);
+  _window = SDL_CreateWindow(_config.name.c_str(), SDL_WINDOWPOS_UNDEFINED,
+                             SDL_WINDOWPOS_UNDEFINED, _config.window_w,
+                             _config.window_h, SDL_WINDOW_SHOWN);
 
-  if (window == NULL) {
+  if (_window == NULL) {
     throw init_exception("Window could not be created! SDL_Error: " +
                          std::string(SDL_GetError()));
   }
 
   // Get the window renderer
-  renderer = SDL_CreateRenderer(
-      window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  _renderer = SDL_CreateRenderer(
+      _window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-  if (renderer == NULL) {
+  if (_renderer == NULL) {
     throw init_exception("Failed to create a window renderer! SDL_Error: " +
                          std::string(SDL_GetError()));
   }
 
   // Load the font id required
-  if (config.font_path.empty() == false) {
-    font = TTF_OpenFont(config.font_path.c_str(), config.font_size);
+  if (_config.font_path.empty() == false) {
+    _font = TTF_OpenFont(_config.font_path.c_str(), _config.font_size);
 
-    if (font == NULL) {
+    if (_font == NULL) {
       throw init_exception("Failed to load the font! SDL_Error: " +
                            std::string(TTF_GetError()));
     }
   }
 
   // Initialize renderer color
-  SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_SetRenderDrawColor(_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+  // Enable Blend mode
+  SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 
   // CALL THE USER INIT
   on_init();
@@ -122,19 +125,19 @@ bool pixello::run()
       }
 
       // Reset the viewport to entire window
-      SDL_RenderSetViewport(renderer, NULL);
+      SDL_RenderSetViewport(_renderer, NULL);
 
       // USER UPDATE
       on_update();
 
       // DRAW
-      SDL_RenderPresent(renderer);
+      SDL_RenderPresent(_renderer);
 
       // PERFORMANCE
       const uint64_t end = SDL_GetPerformanceCounter();
       const float freq = static_cast<float>(SDL_GetPerformanceFrequency());
       const float elapsed_s = (end - start) / freq;
-      const float sleep_for_s = config.target_s_per_frame - elapsed_s;
+      const float sleep_for_s = _config.target_s_per_frame - elapsed_s;
       const uint64_t sleep_for_ms =
           static_cast<uint64_t>(sleep_for_s * 1000.0f);
 
@@ -166,18 +169,18 @@ bool pixello::run()
 
 void pixello::draw_pixel(int32_t x, int32_t y, pixel_t p)
 {
-  SDL_Rect rect = {x * config.pixel_w, y * config.pixel_h, config.pixel_w,
-                   config.pixel_h};
+  SDL_Rect rect = {x * _config.pixel_w, y * _config.pixel_h, _config.pixel_w,
+                   _config.pixel_h};
 
-  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-  SDL_RenderFillRect(renderer, &rect);
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderFillRect(_renderer, &rect);
 }
 
 
 void pixello::clear_screen(pixel_t p)
 {
-  SDL_SetRenderDrawColor(renderer, p.r, p.g, p.b, p.a);
-  SDL_RenderClear(renderer);
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderClear(_renderer);
 }
 
 
@@ -188,7 +191,7 @@ void pixello::draw_texture(const texture_t& t,
                            int32_t h)
 {
   SDL_Rect rect = {x, y, w, h};
-  SDL_RenderCopy(renderer, t.pointer(), NULL, &rect);
+  SDL_RenderCopy(_renderer, t.pointer(), NULL, &rect);
 }
 
 
@@ -198,16 +201,20 @@ void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y)
 }
 
 
-void pixello::set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h)
+void pixello::set_current_viewport(int32_t x,
+                                   int32_t y,
+                                   int32_t w,
+                                   int32_t h,
+                                   pixel_t c)
 {
   // Set viewport
   SDL_Rect rect = {x, y, w, h};
-  SDL_RenderSetViewport(renderer, &rect);
+  SDL_RenderSetViewport(_renderer, &rect);
 
   // Set background color for view port
   SDL_Rect rect2 = {0, 0, w, h};
-  SDL_SetRenderDrawColor(renderer, 0x55, 0x55, 0x55, 0xFF);
-  SDL_RenderFillRect(renderer, &rect2);
+  SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
+  SDL_RenderFillRect(_renderer, &rect2);
 }
 
 
@@ -215,7 +222,7 @@ texture_t pixello::load_image(const std::string& img_path)
 {
   texture_t t;
 
-  SDL_Texture* tmp_ptr = IMG_LoadTexture(renderer, img_path.c_str());
+  SDL_Texture* tmp_ptr = IMG_LoadTexture(_renderer, img_path.c_str());
 
   if (tmp_ptr == NULL) {
     throw load_exceptions("Unable to load image to texture: " + img_path +
@@ -236,7 +243,7 @@ texture_t pixello::create_text(const std::string& text, pixel_t color)
   const SDL_Color c = {color.r, color.g, color.b, color.a};
 
   // Render text surface
-  SDL_Surface* txt_surface = TTF_RenderText_Solid(font, text.c_str(), c);
+  SDL_Surface* txt_surface = TTF_RenderText_Solid(_font, text.c_str(), c);
 
   if (txt_surface == NULL) {
     throw load_exceptions("Failed to generate the text surface: " + text +
@@ -245,7 +252,7 @@ texture_t pixello::create_text(const std::string& text, pixel_t color)
 
   // Create texture from surface pixels
   t._ptr = std::make_shared<sdl_texture_wrapper_t>(
-      SDL_CreateTextureFromSurface(renderer, txt_surface));
+      SDL_CreateTextureFromSurface(_renderer, txt_surface));
 
   if (!t._ptr) {
     // Free the surface in any case

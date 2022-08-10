@@ -22,7 +22,7 @@ struct pixel_t
 {
   union
   {
-    uint32_t n = 0xFF000000;
+    uint32_t n;  // Little endian abgr
     struct
     {
       uint8_t r;
@@ -31,6 +31,12 @@ struct pixel_t
       uint8_t a;
     };
   };
+
+  pixel_t() : n(0xFF000000) {}
+  pixel_t(uint32_t color) : n(color) {}
+  pixel_t(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+      : r(red), g(green), b(blue), a(alpha)
+  {}
 };
 
 struct sdl_texture_wrapper_t
@@ -99,10 +105,11 @@ struct config_t
 class pixello
 {
 private:
-  SDL_Window* window = NULL;
-  SDL_Renderer* renderer = NULL;
-  _TTF_Font* font = NULL;
-  config_t config;
+  SDL_Window* _window = NULL;
+  SDL_Renderer* _renderer = NULL;
+  _TTF_Font* _font = NULL;
+  config_t _config;
+
 
 protected:
   // Override this
@@ -114,7 +121,7 @@ private:
   void init();
 
 public:
-  pixello(config_t configuration) : config(std::move(configuration)) {}
+  pixello(config_t configuration) : _config(std::move(configuration)) {}
   ~pixello();
 
   bool run();
@@ -133,8 +140,12 @@ public:
   texture_t load_image(const std::string& img_path);
   texture_t create_text(const std::string& text, pixel_t color);
 
-  inline int32_t width_in_pixels() const { return config.width_in_pixels; }
-  inline int32_t height_in_pixels() const { return config.height_in_pixels; }
+  inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
+  inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
 
-  void set_current_viewport(int32_t x, int32_t y, int32_t w, int32_t h);
+  void set_current_viewport(int32_t x,
+                            int32_t y,
+                            int32_t w,
+                            int32_t h,
+                            pixel_t color = {0xFF555555});
 };

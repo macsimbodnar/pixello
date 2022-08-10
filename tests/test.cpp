@@ -68,7 +68,7 @@ private:
                  (800 / 2) - (media2.h / 2));
 
     // View port, Images
-    set_current_viewport(0, 0, 320, 213);
+    set_current_viewport(0, 0, 320, 213, {0x5500FF00});
     draw_texture(media1, 10, 10, 300, 193);
 
     // Text
