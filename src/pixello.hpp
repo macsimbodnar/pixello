@@ -22,17 +22,17 @@ struct pixel_t
 {
   union
   {
-    uint32_t n;  // Little endian ABGR
+    uint32_t n; // 0xRRGGGBBBAAA
     struct
     {
-      uint8_t r;
-      uint8_t g;
-      uint8_t b;
       uint8_t a;
+      uint8_t b;
+      uint8_t g;
+      uint8_t r;
     };
   };
 
-  pixel_t() : n(0xFF000000) {}
+  pixel_t() : n(0x000000FF) {}
   pixel_t(uint32_t color) : n(color) {}
   pixel_t(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
       : r(red), g(green), b(blue), a(alpha)
@@ -171,5 +171,5 @@ public:
                             int32_t y,
                             int32_t w,
                             int32_t h,
-                            pixel_t color = {0xFF555555});
+                            pixel_t color = {0x555555FF});
 };

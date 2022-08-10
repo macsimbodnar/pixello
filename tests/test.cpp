@@ -41,7 +41,7 @@ private:
 
   void on_update() override
   {
-    clear_screen({0xFF000000});
+    clear_screen({0x000000FF});
 
     for (uint32_t i = 0; i < 1000; i++) {
       const uint32_t x = (rand() % (width_in_pixels() - 2)) + 1;
@@ -85,7 +85,7 @@ private:
                  (800 / 2) - (media2.h / 2));
 
     // View port, Images
-    set_current_viewport(0, 0, 320, 213, {0x5500FF00});
+    set_current_viewport(0, 0, 320, 213, {0x00FF0055});
     draw_texture(media1, 10, 10, 300, 193);
 
     // Text
