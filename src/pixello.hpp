@@ -10,131 +10,128 @@ struct SDL_Renderer;
 struct SDL_Texture;
 struct _TTF_Font;
 
+/*******************************************************************************
+ * MACRO
+ ******************************************************************************/
 #define STR(_N_) std::to_string(_N_)
 
-class pixello {
-
-private:
-  class sdl_texture_wrapper {
-  public:
-    SDL_Texture *ptr = NULL;
-
-    sdl_texture_wrapper(SDL_Texture *p) : ptr(p) {}
-    ~sdl_texture_wrapper();
-  };
-
-public:
-  struct pixel_t {
-    union {
-      uint32_t n = 0xFF000000;
-      struct {
-        uint8_t r;
-        uint8_t g;
-        uint8_t b;
-        uint8_t a;
-      };
+/*******************************************************************************
+ * STRUCTS
+ ******************************************************************************/
+struct pixel_t
+{
+  union
+  {
+    uint32_t n = 0xFF000000;
+    struct
+    {
+      uint8_t r;
+      uint8_t g;
+      uint8_t b;
+      uint8_t a;
     };
   };
+};
 
-  class texture {
-    friend pixello;
+struct sdl_texture_wrapper_t
+{
+  SDL_Texture* ptr = NULL;
 
-  private:
-    int32_t w = 0;
-    int32_t h = 0;
+  sdl_texture_wrapper_t(SDL_Texture* p) : ptr(p) {}
+  ~sdl_texture_wrapper_t();
+};
 
-    std::shared_ptr<sdl_texture_wrapper> ptr;
+struct texture_t
+{
+  int32_t w = 0;
+  int32_t h = 0;
 
-  protected:
-    texture(pixello *p, const std::string &path);
-    inline SDL_Texture *pointer() const { return ptr.get()->ptr; }
+  std::shared_ptr<sdl_texture_wrapper_t> _ptr;
 
-  public:
-    texture() {}
+  texture_t() {}
+  inline SDL_Texture* pointer() const { return _ptr.get()->ptr; }
+};
 
-    inline int32_t width() const { return w; };
-    inline int32_t height() const { return h; };
-  };
+struct config_t
+{
+  int32_t pixel_w;
+  int32_t pixel_h;
 
-  class text {
-    friend pixello;
+  uint32_t window_w;
+  uint32_t window_h;
 
-  private:
-    int32_t w = 0;
-    int32_t h = 0;
+  const std::string name;
 
-    std::shared_ptr<sdl_texture_wrapper> ptr;
+  float target_fps;
+  float target_s_per_frame;
 
-  protected:
-    text(pixello *p, const std::string &text, pixel_t color);
-    inline SDL_Texture *pointer() const { return ptr.get()->ptr; }
+  int32_t width_in_pixels;
+  int32_t height_in_pixels;
 
-  public:
-    text() {}
+  std::string font_path;
+  int32_t font_size;
 
-    inline int32_t width() const { return w; };
-    inline int32_t height() const { return h; };
-  };
+  config_t(uint32_t pw,
+           uint32_t ph,
+           uint32_t ww,
+           uint32_t wh,
+           std ::string wname,
+           float Hz,
+           std::string font,
+           int32_t font_s)
+      : pixel_w(pw),
+        pixel_h(ph),
+        window_w(ww),
+        window_h(wh),
+        name(std::move(wname)),
+        target_fps(Hz),
+        target_s_per_frame(1 / target_fps),
+        width_in_pixels(window_w / pixel_w),
+        height_in_pixels(window_h / pixel_h),
+        font_path(std::move(font)),
+        font_size(font_s)
+  {}
+};
 
+/*******************************************************************************
+ * PIXELLO CLASS
+ ******************************************************************************/
+class pixello
+{
 private:
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
-  _TTF_Font *font = NULL;
-
-  struct config_t {
-    int32_t pixel_w;
-    int32_t pixel_h;
-
-    uint32_t window_w;
-    uint32_t window_h;
-
-    const std::string name;
-
-    float target_fps;
-    float target_s_per_frame;
-
-    int32_t width_in_pixels;
-    int32_t height_in_pixels;
-
-    std::string font_path;
-    int32_t font_size;
-
-    config_t(uint32_t pw, uint32_t ph, uint32_t ww, uint32_t wh,
-             std ::string wname, float Hz, std::string font, int32_t font_s)
-        : pixel_w(pw), pixel_h(ph), window_w(ww), window_h(wh),
-          name(std::move(wname)), target_fps(Hz),
-          target_s_per_frame(1 / target_fps),
-          width_in_pixels(window_w / pixel_w),
-          height_in_pixels(window_h / pixel_h), font_path(std::move(font)),
-          font_size(font_s) {}
-  };
-
+  SDL_Window* window = NULL;
+  SDL_Renderer* renderer = NULL;
+  _TTF_Font* font = NULL;
   config_t config;
 
 protected:
-  virtual void log(const std::string &msg) = 0;
+  // Override this
+  virtual void log(const std::string& msg) = 0;
   virtual void on_update() = 0;
   virtual void on_init() = 0;
 
+private:
+  void init();
+
 public:
-  pixello(config_t configuration);
+  pixello(config_t configuration) : config(std::move(configuration)) {}
   ~pixello();
 
   bool run();
 
   // Routines
-  void draw(int32_t x, int32_t y, pixel_t p);
-  void clear(pixel_t p);
+  void draw_pixel(int32_t x, int32_t y, pixel_t p);
+  void clear_screen(pixel_t p);
 
-  void draw_texture(const texture &t, int32_t x, int32_t y, int32_t w,
+  void draw_texture(const texture_t& t, int32_t x, int32_t y);
+  void draw_texture(const texture_t& t,
+                    int32_t x,
+                    int32_t y,
+                    int32_t w,
                     int32_t h);
-  void draw_texture(const texture &t, int32_t x, int32_t y);
 
-  void draw_text(const text &t, int32_t x, int32_t y, int32_t w, int32_t h);
-  void draw_text(const text &t, int32_t x, int32_t y);
-
-  texture load_texture(const std::string &path);
-  text create_text(const std::string &t, pixel_t color);
+  texture_t load_image(const std::string& img_path);
+  texture_t create_text(const std::string& text, pixel_t color);
 
   inline int32_t width_in_pixels() const { return config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return config.height_in_pixels; }
