@@ -5,6 +5,23 @@
 texture_t media1;
 texture_t media2;
 
+std::string pos_str(mouse_t::state_t s)
+{
+  std::string res = "";
+  switch (s) {
+    case mouse_t::DOWN:
+      res = "down";
+      break;
+    case mouse_t::UP:
+      res = "up";
+      break;
+    case mouse_t::REST:
+      res = "rest";
+      break;
+  }
+  return res;
+}
+
 class pixel : public pixello
 {
 public:
@@ -74,13 +91,28 @@ private:
     // Text
     set_current_viewport(800 - 320, 800 - 213, 320, 213);
     p.n = 0xFF0000FF;
-    texture_t text1 = create_text("Hello world!!!!", p);
-    draw_texture(text1, 20, 100);
 
     // PRINT FPS
     uint32_t fps = FPS();
     texture_t FPS = create_text("FPS: " + STR(fps), p);
     draw_texture(FPS, 320 - (FPS.w + 5), 5);
+
+    // Mouse
+    mouse_t pos = mouse_position();
+    texture_t mouse_pos_texture =
+        create_text("X: " + STR(pos.x) + " Y: " + STR(pos.y), p);
+    draw_texture(mouse_pos_texture, 2, 2);
+
+    std::string left_button = "LEFT   old: " + pos_str(pos.left_old_state) +
+                              " | new: " + pos_str(pos.left_new_state);
+
+    std::string right_button = "RIGHT  old: " + pos_str(pos.right_old_state) +
+                               " | new: " + pos_str(pos.right_new_state);
+
+    texture_t mouse_left_button = create_text(left_button, p);
+    draw_texture(mouse_left_button, 2, 30);
+    texture_t mouse_right_button = create_text(right_button, p);
+    draw_texture(mouse_right_button, 2, 60);
   }
 };
 

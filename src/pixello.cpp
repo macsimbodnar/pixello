@@ -116,11 +116,48 @@ bool pixello::run()
 
       // POLL EVENTS
       while (SDL_PollEvent(&event)) {
-        if ((SDL_QUIT == event.type) ||
-            (SDL_KEYDOWN == event.type &&
-             SDL_SCANCODE_ESCAPE == event.key.keysym.scancode)) {
-          running = false;
-          break;
+        switch (event.type) {
+          case SDL_QUIT:
+            running = false;
+            break;
+
+          case SDL_KEYDOWN:
+            if (SDL_SCANCODE_ESCAPE == event.key.keysym.scancode) {
+              running = false;
+            }
+            break;
+
+          case SDL_MOUSEMOTION:
+            SDL_GetMouseState(&_mouse_position.x, &_mouse_position.y);
+            break;
+
+          case SDL_MOUSEBUTTONDOWN:
+            switch (event.button.button) {
+              case SDL_BUTTON_LEFT:
+                _mouse_position.left_old_state = _mouse_position.left_new_state;
+                _mouse_position.left_new_state = mouse_t::DOWN;
+                break;
+              case SDL_BUTTON_RIGHT:
+                _mouse_position.right_old_state =
+                    _mouse_position.right_new_state;
+                _mouse_position.right_new_state = mouse_t::DOWN;
+                break;
+            }
+            break;
+
+          case SDL_MOUSEBUTTONUP:
+            switch (event.button.button) {
+              case SDL_BUTTON_LEFT:
+                _mouse_position.left_old_state = _mouse_position.left_new_state;
+                _mouse_position.left_new_state = mouse_t::UP;
+                break;
+              case SDL_BUTTON_RIGHT:
+                _mouse_position.right_old_state =
+                    _mouse_position.right_new_state;
+                _mouse_position.right_new_state = mouse_t::UP;
+                break;
+            }
+            break;
         }
       }
 

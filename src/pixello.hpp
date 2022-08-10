@@ -22,7 +22,7 @@ struct pixel_t
 {
   union
   {
-    uint32_t n;  // Little endian abgr
+    uint32_t n;  // Little endian ABGR
     struct
     {
       uint8_t r;
@@ -99,6 +99,24 @@ struct config_t
   {}
 };
 
+struct mouse_t
+{
+  enum state_t
+  {
+    REST,
+    DOWN,
+    UP
+  };
+
+  int32_t x = 0;
+  int32_t y = 0;
+
+  state_t left_old_state = REST;
+  state_t left_new_state = REST;
+  state_t right_old_state = REST;
+  state_t right_new_state = REST;
+};
+
 /*******************************************************************************
  * PIXELLO CLASS
  ******************************************************************************/
@@ -106,12 +124,13 @@ class pixello
 {
 private:
   uint32_t _FPS = 0;
+  mouse_t _mouse_position = {0};
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
   _TTF_Font* _font = NULL;
-  config_t _config;
 
+  config_t _config;
 
 protected:
   // Override this
@@ -144,6 +163,8 @@ public:
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
+  inline mouse_t mouse_position() const { return _mouse_position; }
+
   inline uint32_t FPS() const { return _FPS; }
 
   void set_current_viewport(int32_t x,
