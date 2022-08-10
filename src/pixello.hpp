@@ -22,7 +22,7 @@ struct pixel_t
 {
   union
   {
-    uint32_t n; // 0xRRGGGBBBAAA
+    uint32_t n;  // 0xRRGGGBBBAAA
     struct
     {
       uint8_t a;
@@ -172,4 +172,12 @@ public:
                             int32_t w,
                             int32_t h,
                             pixel_t color = {0x555555FF});
+
+  inline bool is_mouse_in(int32_t x, int32_t y, int32_t w, int32_t h) const
+  {
+    return ((_mouse_position.x >= x) && (_mouse_position.x < (x + w)) &&
+            (_mouse_position.y >= y) && (_mouse_position.y < (y + h)))
+               ? true
+               : false;
+  }
 };

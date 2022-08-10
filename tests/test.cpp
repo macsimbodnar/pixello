@@ -5,6 +5,9 @@
 texture_t media1;
 texture_t media2;
 
+int32_t media2_x;
+int32_t media2_y;
+
 std::string pos_str(mouse_t::state_t s)
 {
   std::string res = "";
@@ -37,6 +40,9 @@ private:
   {
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
+
+    media2_x = (800 / 2) - (media2.w / 2);
+    media2_y = (800 / 2) - (media2.h / 2);
   }
 
   void on_update() override
@@ -80,9 +86,15 @@ private:
     p.b = 255;
     draw_pixel(0, height_in_pixels() - 1, p);  // bottom left purple
 
+    // Update medai2 position if mouse current state button down
+    if (is_mouse_in(media2_x, media2_y, media2.w, media2.h) &&
+        mouse_position().left_new_state == mouse_t::DOWN) {
+      media2_x = mouse_position().x;
+      media2_y = mouse_position().y;
+    }
+
     // Draw texture with transparency
-    draw_texture(media2, (800 / 2) - (media2.w / 2),
-                 (800 / 2) - (media2.h / 2));
+    draw_texture(media2, media2_x, media2_y);
 
     // View port, Images
     set_current_viewport(0, 0, 320, 213, {0x00FF0055});
