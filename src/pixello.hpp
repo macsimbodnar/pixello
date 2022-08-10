@@ -105,6 +105,8 @@ struct config_t
 class pixello
 {
 private:
+  uint32_t _FPS = 0;
+
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
   _TTF_Font* _font = NULL;
@@ -142,6 +144,7 @@ public:
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
+  inline uint32_t FPS() const { return _FPS; }
 
   void set_current_viewport(int32_t x,
                             int32_t y,

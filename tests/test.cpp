@@ -76,6 +76,11 @@ private:
     p.n = 0xFF0000FF;
     texture_t text1 = create_text("Hello world!!!!", p);
     draw_texture(text1, 20, 100);
+
+    // PRINT FPS
+    uint32_t fps = FPS();
+    texture_t FPS = create_text("FPS: " + STR(fps), p);
+    draw_texture(FPS, 320 - (FPS.w + 5), 5);
   }
 };
 

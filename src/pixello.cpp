@@ -151,7 +151,8 @@ bool pixello::run()
       const float FPS_elapsed_s = (end - FPS_last_check) / freq;
       if (FPS_elapsed_s > 1.0f) {
         FPS_last_check = end;
-        log("FPS: " + STR(FPS_counter));
+        // log("FPS: " + STR(FPS_counter));
+        _FPS = FPS_counter;
         FPS_counter = 0;
       } else {
         ++FPS_counter;
