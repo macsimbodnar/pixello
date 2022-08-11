@@ -30,6 +30,11 @@ pixello::~pixello()
   SDL_Quit();
 }
 
+void pixello::log(const std::string& msg)
+{
+  std::cout << msg << std::endl;
+}
+
 void pixello::init()
 {
   // INITIALIZATION
@@ -128,35 +133,35 @@ bool pixello::run()
             break;
 
           case SDL_MOUSEMOTION:
-            SDL_GetMouseState(&_mouse_position.x, &_mouse_position.y);
+            _old_mouse_state.x = _mouse_state.x;
+            _old_mouse_state.y = _mouse_state.y;
+            SDL_GetMouseState(&_mouse_state.x, &_mouse_state.y);
+            _mouse_state.x_delta = _mouse_state.x - _old_mouse_state.x;
+            _mouse_state.y_delta = _mouse_state.y - _old_mouse_state.y;
             break;
 
           case SDL_MOUSEBUTTONDOWN:
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
-                _mouse_position.left_old_state = _mouse_position.left_new_state;
-                _mouse_position.left_new_state = mouse_t::DOWN;
+                _mouse_state.left_button.state = button_t::DOWN;
                 break;
               case SDL_BUTTON_RIGHT:
-                _mouse_position.right_old_state =
-                    _mouse_position.right_new_state;
-                _mouse_position.right_new_state = mouse_t::DOWN;
+                _mouse_state.right_button.state = button_t::DOWN;
                 break;
             }
+            mouse_button_event();
             break;
 
           case SDL_MOUSEBUTTONUP:
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
-                _mouse_position.left_old_state = _mouse_position.left_new_state;
-                _mouse_position.left_new_state = mouse_t::UP;
+                _mouse_state.left_button.state = button_t::UP;
                 break;
               case SDL_BUTTON_RIGHT:
-                _mouse_position.right_old_state =
-                    _mouse_position.right_new_state;
-                _mouse_position.right_new_state = mouse_t::UP;
+                _mouse_state.right_button.state = button_t::UP;
                 break;
             }
+            mouse_button_event();
             break;
         }
       }
@@ -195,7 +200,6 @@ bool pixello::run()
         ++FPS_counter;
       }
     }
-
   } catch (pixello_exception& e) {
     log("Exception: " + std::string(e.what()));
     return false;

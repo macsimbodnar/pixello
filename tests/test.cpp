@@ -8,20 +8,22 @@ texture_t media2;
 int32_t media2_x;
 int32_t media2_y;
 
-std::string pos_str(mouse_t::state_t s)
+bool holding_icon;
+int32_t holding_offset_x;
+int32_t holding_offset_y;
+
+std::string pos_str(button_t::state_t s)
 {
   std::string res = "";
   switch (s) {
-    case mouse_t::DOWN:
+    case button_t::DOWN:
       res = "down";
       break;
-    case mouse_t::UP:
+    case button_t::UP:
       res = "up";
       break;
-    case mouse_t::REST:
-      res = "rest";
-      break;
   }
+
   return res;
 }
 
@@ -43,6 +45,10 @@ private:
 
     media2_x = (800 / 2) - (media2.w / 2);
     media2_y = (800 / 2) - (media2.h / 2);
+
+    holding_icon = false;
+    holding_offset_x = 0;
+    holding_offset_y = 0;
   }
 
   void on_update() override
@@ -86,11 +92,26 @@ private:
     p.b = 255;
     draw_pixel(0, height_in_pixels() - 1, p);  // bottom left purple
 
-    // Update medai2 position if mouse current state button down
+
+    // Update media2 position if mouse current state button down
     if (is_mouse_in(media2_x, media2_y, media2.w, media2.h) &&
-        mouse_position().left_new_state == mouse_t::DOWN) {
-      media2_x = mouse_position().x;
-      media2_y = mouse_position().y;
+        (mouse_state().left_button.state == button_t::DOWN)) {
+      if (!holding_icon) {
+        holding_offset_x = mouse_state().x - media2_x;
+        holding_offset_y = mouse_state().y - media2_y;
+      }
+      holding_icon = true;
+    }
+
+    if (mouse_state().left_button.state == button_t::UP) {
+      holding_icon = false;
+      holding_offset_x = 0;
+      holding_offset_y = 0;
+    }
+
+    if (holding_icon) {
+      media2_x = mouse_state().x - holding_offset_x;
+      media2_y = mouse_state().y - holding_offset_y;
     }
 
     // Draw texture with transparency
@@ -110,21 +131,14 @@ private:
     draw_texture(FPS, 320 - (FPS.w + 5), 5);
 
     // Mouse
-    mouse_t pos = mouse_position();
+    mouse_t state = mouse_state();
     texture_t mouse_pos_texture =
-        create_text("X: " + STR(pos.x) + " Y: " + STR(pos.y), p);
-    draw_texture(mouse_pos_texture, 2, 2);
+        create_text("X: " + STR(state.x) + " Y: " + STR(state.y), p);
+    draw_texture(mouse_pos_texture, 0, 0);
 
-    std::string left_button = "LEFT   old: " + pos_str(pos.left_old_state) +
-                              " | new: " + pos_str(pos.left_new_state);
-
-    std::string right_button = "RIGHT  old: " + pos_str(pos.right_old_state) +
-                               " | new: " + pos_str(pos.right_new_state);
-
-    texture_t mouse_left_button = create_text(left_button, p);
-    draw_texture(mouse_left_button, 2, 30);
-    texture_t mouse_right_button = create_text(right_button, p);
-    draw_texture(mouse_right_button, 2, 60);
+    texture_t left_button_texture =
+        create_text("MLB: " + pos_str(state.left_button.state), p);
+    draw_texture(left_button_texture, 0, 20);
   }
 };
 

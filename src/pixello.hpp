@@ -99,22 +99,27 @@ struct config_t
   {}
 };
 
-struct mouse_t
+struct button_t
 {
   enum state_t
   {
-    REST,
     DOWN,
     UP
   };
 
+  state_t state = UP;
+};
+
+struct mouse_t
+{
   int32_t x = 0;
   int32_t y = 0;
+  int32_t x_delta = 0;
+  int32_t y_delta = 0;
 
-  state_t left_old_state = REST;
-  state_t left_new_state = REST;
-  state_t right_old_state = REST;
-  state_t right_new_state = REST;
+  button_t left_button;
+  button_t central_button;
+  button_t right_button;
 };
 
 /*******************************************************************************
@@ -124,7 +129,8 @@ class pixello
 {
 private:
   uint32_t _FPS = 0;
-  mouse_t _mouse_position = {0};
+  mouse_t _old_mouse_state = {0};
+  mouse_t _mouse_state = {0};
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
@@ -133,10 +139,13 @@ private:
   config_t _config;
 
 protected:
-  // Override this
-  virtual void log(const std::string& msg) = 0;
+  // Have to Override this
   virtual void on_update() = 0;
   virtual void on_init() = 0;
+
+  // You can override this if you want
+  virtual void log(const std::string& msg);
+  virtual void mouse_button_event() {}
 
 private:
   void init();
@@ -163,7 +172,7 @@ public:
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
-  inline mouse_t mouse_position() const { return _mouse_position; }
+  inline mouse_t mouse_state() const { return _mouse_state; }
 
   inline uint32_t FPS() const { return _FPS; }
 
@@ -175,8 +184,8 @@ public:
 
   inline bool is_mouse_in(int32_t x, int32_t y, int32_t w, int32_t h) const
   {
-    return ((_mouse_position.x >= x) && (_mouse_position.x < (x + w)) &&
-            (_mouse_position.y >= y) && (_mouse_position.y < (y + h)))
+    return ((_mouse_state.x >= x) && (_mouse_state.x < (x + w)) &&
+            (_mouse_state.y >= y) && (_mouse_state.y < (y + h)))
                ? true
                : false;
   }
