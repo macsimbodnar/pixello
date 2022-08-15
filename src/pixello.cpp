@@ -35,7 +35,7 @@ void pixello::log(const std::string& msg)
   std::cout << msg << std::endl;
 }
 
-void pixello::init(void *external_data)
+void pixello::init()
 {
   // INITIALIZATION
   int res;
@@ -100,14 +100,14 @@ void pixello::init(void *external_data)
   SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 
   // CALL THE USER INIT
-  on_init(external_data);
+  on_init(_external_data);
 }
 
 
-bool pixello::run(void *external_data)
+bool pixello::run()
 {
   try {
-    init(external_data);
+    init();
 
     SDL_Event event;
     bool running = true;
@@ -170,7 +170,7 @@ bool pixello::run(void *external_data)
       SDL_RenderSetViewport(_renderer, NULL);
 
       // USER UPDATE
-      on_update(external_data);
+      on_update(_external_data);
 
       // DRAW
       SDL_RenderPresent(_renderer);
