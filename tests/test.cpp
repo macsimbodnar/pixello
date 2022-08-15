@@ -38,7 +38,7 @@ public:
 private:
   void log(const std::string& msg) override { std::cout << msg << std::endl; }
 
-  void on_init() override
+  void on_init(void *data) override
   {
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
@@ -51,7 +51,7 @@ private:
     holding_offset_y = 0;
   }
 
-  void on_update() override
+  void on_update(void *data) override
   {
     clear_screen({0x000000FF});
 

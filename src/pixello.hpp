@@ -140,21 +140,21 @@ private:
 
 protected:
   // Have to Override this
-  virtual void on_update() = 0;
-  virtual void on_init() = 0;
+  virtual void on_update(void *external_data) = 0;
+  virtual void on_init(void *external_data) = 0;
 
   // You can override this if you want
   virtual void log(const std::string& msg);
   virtual void mouse_button_event() {}
 
 private:
-  void init();
+  void init(void *external_data);
 
 public:
   pixello(config_t configuration) : _config(std::move(configuration)) {}
   ~pixello();
 
-  bool run();
+  bool run(void *external_data = nullptr);
 
   // Routines
   void draw_pixel(int32_t x, int32_t y, pixel_t p);
