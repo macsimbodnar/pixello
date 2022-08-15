@@ -31,14 +31,19 @@ class pixel : public pixello
 {
 public:
   pixel()
-      : pixello({5, 5, 800, 800, "Test pixello", 60,
-                 "assets/font/PressStart2P.ttf", 10})
+      : pixello(20,
+                800,
+                800,
+                "Test pixello",
+                60,
+                "assets/font/PressStart2P.ttf",
+                10)
   {}
 
 private:
   void log(const std::string& msg) override { std::cout << msg << std::endl; }
 
-  void on_init(void *data) override
+  void on_init(void* data) override
   {
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
@@ -51,7 +56,7 @@ private:
     holding_offset_y = 0;
   }
 
-  void on_update(void *data) override
+  void on_update(void* data) override
   {
     clear_screen({0x000000FF});
 
@@ -94,7 +99,8 @@ private:
 
 
     // Update media2 position if mouse current state button down
-    if (is_mouse_in(media2_x, media2_y, media2.w, media2.h) &&
+    const rect_t r = {media2_x, media2_y, media2.w, media2.h};
+    if (is_mouse_in(r) &&
         (mouse_state().left_button.state == button_t::DOWN)) {
       if (!holding_icon) {
         holding_offset_x = mouse_state().x - media2_x;
@@ -118,11 +124,11 @@ private:
     draw_texture(media2, media2_x, media2_y);
 
     // View port, Images
-    set_current_viewport(0, 0, 320, 213, {0x00FF0055});
-    draw_texture(media1, 10, 10, 300, 193);
+    set_current_viewport({0, 0, 320, 213}, {0x00FF0055});
+    draw_texture(media1, {10, 10, 300, 193});
 
     // Text
-    set_current_viewport(800 - 320, 800 - 213, 320, 213);
+    set_current_viewport({800 - 320, 800 - 213, 320, 213});
     p.n = 0xFF0000FF;
 
     // PRINT FPS

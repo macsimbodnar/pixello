@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+
 // Forward declaration to avoid include sdl in this header
 struct SDL_Window;
 struct SDL_Renderer;
@@ -15,9 +16,15 @@ struct _TTF_Font;
  ******************************************************************************/
 #define STR(_N_) std::to_string(_N_)
 
+
 /*******************************************************************************
  * STRUCTS
  ******************************************************************************/
+struct rect_t {
+  int x,y;
+  int w,h;
+};
+
 struct pixel_t
 {
   union
@@ -60,8 +67,7 @@ struct texture_t
 
 struct config_t
 {
-  int32_t pixel_w;
-  int32_t pixel_h;
+  int32_t pixel_size;
 
   uint32_t window_w;
   uint32_t window_h;
@@ -77,26 +83,26 @@ struct config_t
   std::string font_path;
   int32_t font_size;
 
-  config_t(uint32_t pw,
-           uint32_t ph,
+  config_t(uint32_t ps,
            uint32_t ww,
            uint32_t wh,
            std ::string wname,
            float Hz,
            std::string font,
            int32_t font_s)
-      : pixel_w(pw),
-        pixel_h(ph),
+      : pixel_size(ps),
         window_w(ww),
         window_h(wh),
         name(std::move(wname)),
         target_fps(Hz),
         target_s_per_frame(1 / target_fps),
-        width_in_pixels(window_w / pixel_w),
-        height_in_pixels(window_h / pixel_h),
+        width_in_pixels(window_w / pixel_size),
+        height_in_pixels(window_h / pixel_size),
         font_path(std::move(font)),
         font_size(font_s)
-  {}
+  {
+    if (pixel_size < 1) { pixel_size = 1; }
+  }
 };
 
 struct button_t
@@ -140,6 +146,8 @@ private:
 
   void* _external_data = nullptr;
 
+  void init();
+
 protected:
   // Have to Override this
   virtual void on_update(void* external_data) = 0;
@@ -149,30 +157,44 @@ protected:
   virtual void log(const std::string& msg);
   virtual void mouse_button_event() {}
 
-private:
-  void init();
-
 public:
-  pixello(config_t configuration, void* external_data = nullptr)
-      : _config(std::move(configuration)), _external_data(external_data)
+  pixello(uint32_t ww,
+          uint32_t wh,
+          std ::string wname,
+          float Hz,
+          std::string font,
+          int32_t font_s,
+          void* external_data = nullptr)
+      : _config({1, ww, wh, wname, Hz, font, font_s}),
+        _external_data(external_data)
   {}
+
+  pixello(uint32_t pixel_size,
+          uint32_t ww,
+          uint32_t wh,
+          std ::string wname,
+          float Hz,
+          std::string font,
+          int32_t font_s,
+          void* external_data = nullptr)
+      : _config({pixel_size, ww, wh, wname, Hz, font, font_s}),
+        _external_data(external_data)
+  {}
+
   ~pixello();
 
   bool run();
 
   // Routines
-  void draw_pixel(int32_t x, int32_t y, pixel_t p);
-  void clear_screen(pixel_t p);
+  void draw_pixel(int32_t x, int32_t y, const pixel_t& p);
+  void draw_rect(const rect_t& rect, const pixel_t& p);
+  void clear_screen(const pixel_t& p);
 
   void draw_texture(const texture_t& t, int32_t x, int32_t y);
-  void draw_texture(const texture_t& t,
-                    int32_t x,
-                    int32_t y,
-                    int32_t w,
-                    int32_t h);
+  void draw_texture(const texture_t& t, const rect_t& rect);
 
   texture_t load_image(const std::string& img_path);
-  texture_t create_text(const std::string& text, pixel_t color);
+  texture_t create_text(const std::string& text, const pixel_t& color);
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
@@ -180,17 +202,8 @@ public:
 
   inline uint32_t FPS() const { return _FPS; }
 
-  void set_current_viewport(int32_t x,
-                            int32_t y,
-                            int32_t w,
-                            int32_t h,
-                            pixel_t color = {0x555555FF});
+  void set_current_viewport(const rect_t& rect,
+                            const pixel_t& color = {0x555555FF});
 
-  inline bool is_mouse_in(int32_t x, int32_t y, int32_t w, int32_t h) const
-  {
-    return ((_mouse_state.x >= x) && (_mouse_state.x < (x + w)) &&
-            (_mouse_state.y >= y) && (_mouse_state.y < (y + h)))
-               ? true
-               : false;
-  }
+  bool is_mouse_in(const rect_t& rect) const;
 };

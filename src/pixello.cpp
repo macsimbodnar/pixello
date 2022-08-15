@@ -1,6 +1,5 @@
 #include "pixello.hpp"
 #include <iostream>
-#include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_ttf.h"
@@ -209,52 +208,43 @@ bool pixello::run()
 }
 
 
-void pixello::draw_pixel(int32_t x, int32_t y, pixel_t p)
+void pixello::draw_pixel(int32_t x, int32_t y, const pixel_t& p)
 {
-  SDL_Rect rect = {x * _config.pixel_w, y * _config.pixel_h, _config.pixel_w,
-                   _config.pixel_h};
+  SDL_Rect rect = {x * _config.pixel_size, y * _config.pixel_size,
+                   _config.pixel_size, _config.pixel_size};
 
   SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
   SDL_RenderFillRect(_renderer, &rect);
 }
 
 
-void pixello::clear_screen(pixel_t p)
+void pixello::clear_screen(const pixel_t& p)
 {
   SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
   SDL_RenderClear(_renderer);
 }
 
 
-void pixello::draw_texture(const texture_t& t,
-                           int32_t x,
-                           int32_t y,
-                           int32_t w,
-                           int32_t h)
+void pixello::draw_texture(const texture_t& t, const rect_t& rect)
 {
-  SDL_Rect rect = {x, y, w, h};
-  SDL_RenderCopy(_renderer, t.pointer(), NULL, &rect);
+  SDL_RenderCopy(_renderer, t.pointer(), NULL, (SDL_Rect*)&rect);
 }
 
 
 void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y)
 {
-  draw_texture(t, x, y, t.w, t.h);
+  const rect_t rect = {x, y, t.w, t.h};
+  draw_texture(t, rect);
 }
 
 
-void pixello::set_current_viewport(int32_t x,
-                                   int32_t y,
-                                   int32_t w,
-                                   int32_t h,
-                                   pixel_t c)
+void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
 {
   // Set viewport
-  SDL_Rect rect = {x, y, w, h};
-  SDL_RenderSetViewport(_renderer, &rect);
+  SDL_RenderSetViewport(_renderer, (SDL_Rect*)&rect);
 
   // Set background color for view port
-  SDL_Rect rect2 = {0, 0, w, h};
+  SDL_Rect rect2 = {0, 0, rect.w, rect.h};
   SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
   SDL_RenderFillRect(_renderer, &rect2);
 }
@@ -279,7 +269,7 @@ texture_t pixello::load_image(const std::string& img_path)
 }
 
 
-texture_t pixello::create_text(const std::string& text, pixel_t color)
+texture_t pixello::create_text(const std::string& text, const pixel_t& color)
 {
   texture_t t;
   const SDL_Color c = {color.r, color.g, color.b, color.a};
@@ -312,4 +302,13 @@ texture_t pixello::create_text(const std::string& text, pixel_t color)
   SDL_FreeSurface(txt_surface);
 
   return t;
+}
+
+
+bool pixello::is_mouse_in(const rect_t& rect) const
+{
+  return ((_mouse_state.x >= rect.x) && (_mouse_state.x < (rect.x + rect.w)) &&
+          (_mouse_state.y >= rect.y) && (_mouse_state.y < (rect.y + rect.h)))
+             ? true
+             : false;
 }
