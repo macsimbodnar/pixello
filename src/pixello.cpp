@@ -217,6 +217,12 @@ void pixello::draw_pixel(int32_t x, int32_t y, const pixel_t& p)
   SDL_RenderFillRect(_renderer, &rect);
 }
 
+void pixello::draw_rect(const rect_t& rect, const pixel_t& p)
+{
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderFillRect(_renderer, (SDL_Rect*)&rect);
+}
+
 
 void pixello::clear_screen(const pixel_t& p)
 {

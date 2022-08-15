@@ -58,7 +58,7 @@ private:
 
   void on_update(void* data) override
   {
-    clear_screen({0x000000FF});
+    clear_screen(0x000000FF);
 
     for (uint32_t i = 0; i < 1000; i++) {
       const uint32_t x = (rand() % (width_in_pixels() - 2)) + 1;
@@ -97,6 +97,10 @@ private:
     p.b = 255;
     draw_pixel(0, height_in_pixels() - 1, p);  // bottom left purple
 
+    // Draw a rect
+    rect_t center = {width() / 2 - 100, height() / 2 - 100, 200, 200};
+    draw_rect(center, 0xFF00FFFF);
+
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
@@ -124,7 +128,7 @@ private:
     draw_texture(media2, media2_x, media2_y);
 
     // View port, Images
-    set_current_viewport({0, 0, 320, 213}, {0x00FF0055});
+    set_current_viewport({0, 0, 320, 213}, 0x00FF0055);
     draw_texture(media1, {10, 10, 300, 193});
 
     // Text

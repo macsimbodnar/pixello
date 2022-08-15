@@ -20,9 +20,10 @@ struct _TTF_Font;
 /*******************************************************************************
  * STRUCTS
  ******************************************************************************/
-struct rect_t {
-  int x,y;
-  int w,h;
+struct rect_t
+{
+  int x, y;
+  int w, h;
 };
 
 struct pixel_t
@@ -198,6 +199,8 @@ public:
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
+  inline int32_t width() const { return _config.window_w; }
+  inline int32_t height() const { return _config.window_h; }
   inline mouse_t mouse_state() const { return _mouse_state; }
 
   inline uint32_t FPS() const { return _FPS; }
