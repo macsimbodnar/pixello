@@ -172,6 +172,12 @@ private:
     draw_texture(double_click_counter_texture, 0, y_draw_offset);
 
     y_draw_offset += double_click_counter_texture.h;
+
+    texture_t did_mouse_moved_texture =
+        create_text("Moved: " + STR(mouse_state().did_mouse_moved), p);
+    draw_texture(did_mouse_moved_texture, 0, y_draw_offset);
+
+    y_draw_offset += did_mouse_moved_texture.h;
   }
 };
 

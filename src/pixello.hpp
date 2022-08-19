@@ -123,8 +123,7 @@ struct mouse_t
 {
   int32_t x = 0;
   int32_t y = 0;
-  int32_t x_delta = 0;
-  int32_t y_delta = 0;
+  bool did_mouse_moved = false;
 
   button_t left_button;
   button_t central_button;
@@ -138,7 +137,6 @@ class pixello
 {
 private:
   uint32_t _FPS = 0;
-  mouse_t _old_mouse_state = {0};
   mouse_t _mouse_state = {0};
 
   SDL_Window* _window = NULL;
@@ -203,6 +201,7 @@ public:
   inline int32_t width() const { return _config.window_w; }
   inline int32_t height() const { return _config.window_h; }
   inline mouse_t mouse_state() const { return _mouse_state; }
+
   inline void mouse_reset_clicks()
   {
     _mouse_state.left_button.click = false;

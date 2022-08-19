@@ -118,6 +118,9 @@ bool pixello::run()
     while (running) {
       const uint64_t start = SDL_GetPerformanceCounter();
 
+      // Reset did mouse moved flag
+      _mouse_state.did_mouse_moved = false;
+
       // POLL EVENTS
       while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -132,11 +135,8 @@ bool pixello::run()
             break;
 
           case SDL_MOUSEMOTION:
-            _old_mouse_state.x = _mouse_state.x;
-            _old_mouse_state.y = _mouse_state.y;
             SDL_GetMouseState(&_mouse_state.x, &_mouse_state.y);
-            _mouse_state.x_delta = _mouse_state.x - _old_mouse_state.x;
-            _mouse_state.y_delta = _mouse_state.y - _old_mouse_state.y;
+            _mouse_state.did_mouse_moved = true;
             break;
 
           case SDL_MOUSEBUTTONDOWN:
