@@ -186,6 +186,9 @@ bool pixello::run()
       // USER UPDATE
       on_update(_external_data);
 
+      // Reset mouse click state
+      mouse_reset_clicks();
+
       // DRAW
       SDL_RenderPresent(_renderer);
 

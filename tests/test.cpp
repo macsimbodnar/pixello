@@ -161,8 +161,6 @@ private:
 
     if (mouse_state().left_button.double_click) { ++double_click_counter; }
 
-    mouse_reset_clicks();
-
     texture_t click_counter_texture =
         create_text("Clicks: " + STR(click_counter), p);
     draw_texture(click_counter_texture, 0, y_draw_offset);
