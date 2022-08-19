@@ -115,6 +115,8 @@ struct button_t
   };
 
   state_t state = UP;
+  bool click = false;
+  bool double_click = false;
 };
 
 struct mouse_t
@@ -156,7 +158,6 @@ protected:
 
   // You can override this if you want
   virtual void log(const std::string& msg);
-  virtual void mouse_button_event() {}
 
 public:
   pixello(uint32_t ww,
@@ -202,6 +203,15 @@ public:
   inline int32_t width() const { return _config.window_w; }
   inline int32_t height() const { return _config.window_h; }
   inline mouse_t mouse_state() const { return _mouse_state; }
+  inline void mouse_reset_clicks()
+  {
+    _mouse_state.left_button.click = false;
+    _mouse_state.left_button.double_click = false;
+    _mouse_state.right_button.click = false;
+    _mouse_state.right_button.double_click = false;
+    _mouse_state.central_button.click = false;
+    _mouse_state.central_button.double_click = false;
+  }
 
   inline uint32_t FPS() const { return _FPS; }
 

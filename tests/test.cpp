@@ -12,6 +12,9 @@ bool holding_icon;
 int32_t holding_offset_x;
 int32_t holding_offset_y;
 
+uint32_t click_counter = 0;
+uint32_t double_click_counter = 0;
+
 std::string pos_str(button_t::state_t s)
 {
   std::string res = "";
@@ -104,8 +107,7 @@ private:
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
-    if (is_mouse_in(r) &&
-        (mouse_state().left_button.state == button_t::DOWN)) {
+    if (is_mouse_in(r) && (mouse_state().left_button.state == button_t::DOWN)) {
       if (!holding_icon) {
         holding_offset_x = mouse_state().x - media2_x;
         holding_offset_y = mouse_state().y - media2_y;
@@ -138,17 +140,40 @@ private:
     // PRINT FPS
     uint32_t fps = FPS();
     texture_t FPS = create_text("FPS: " + STR(fps), p);
-    draw_texture(FPS, 320 - (FPS.w + 5), 5);
+    draw_texture(FPS, 320 - FPS.w, 0);
 
+    int32_t y_draw_offset = 0;
     // Mouse
     mouse_t state = mouse_state();
     texture_t mouse_pos_texture =
         create_text("X: " + STR(state.x) + " Y: " + STR(state.y), p);
-    draw_texture(mouse_pos_texture, 0, 0);
+    draw_texture(mouse_pos_texture, 0, y_draw_offset);
+
+    y_draw_offset += mouse_pos_texture.h;
 
     texture_t left_button_texture =
         create_text("MLB: " + pos_str(state.left_button.state), p);
-    draw_texture(left_button_texture, 0, 20);
+    draw_texture(left_button_texture, 0, y_draw_offset);
+
+    y_draw_offset += left_button_texture.h;
+
+    if (mouse_state().left_button.click) { ++click_counter; }
+
+    if (mouse_state().left_button.double_click) { ++double_click_counter; }
+
+    mouse_reset_clicks();
+
+    texture_t click_counter_texture =
+        create_text("Clicks: " + STR(click_counter), p);
+    draw_texture(click_counter_texture, 0, y_draw_offset);
+
+    y_draw_offset += click_counter_texture.h;
+
+    texture_t double_click_counter_texture =
+        create_text("Double clicks: " + STR(double_click_counter), p);
+    draw_texture(double_click_counter_texture, 0, y_draw_offset);
+
+    y_draw_offset += double_click_counter_texture.h;
   }
 };
 

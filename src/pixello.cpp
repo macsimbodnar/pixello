@@ -143,12 +143,25 @@ bool pixello::run()
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
                 _mouse_state.left_button.state = button_t::DOWN;
+                _mouse_state.left_button.click =
+                    event.button.clicks == 1 ? true : false;
+                _mouse_state.left_button.double_click =
+                    event.button.clicks == 2 ? true : false;
                 break;
               case SDL_BUTTON_RIGHT:
                 _mouse_state.right_button.state = button_t::DOWN;
+                _mouse_state.right_button.click =
+                    event.button.clicks == 1 ? true : false;
+                _mouse_state.right_button.double_click =
+                    event.button.clicks == 2 ? true : false;
+              case SDL_BUTTON_MIDDLE:
+                _mouse_state.central_button.state = button_t::DOWN;
+                _mouse_state.central_button.click =
+                    event.button.clicks == 1 ? true : false;
+                _mouse_state.central_button.double_click =
+                    event.button.clicks == 2 ? true : false;
                 break;
             }
-            mouse_button_event();
             break;
 
           case SDL_MOUSEBUTTONUP:
@@ -159,8 +172,10 @@ bool pixello::run()
               case SDL_BUTTON_RIGHT:
                 _mouse_state.right_button.state = button_t::UP;
                 break;
+              case SDL_BUTTON_MIDDLE:
+                _mouse_state.central_button.state = button_t::UP;
+                break;
             }
-            mouse_button_event();
             break;
         }
       }
