@@ -4,10 +4,16 @@ project(pixello)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
+option(PIXELLO_ENABLE_TESTS "Enable testing" ON)
 
 add_subdirectory(src)
 
+if(PIXELLO_ENABLE_TESTS)
+message("Pixello tests enabled")
 enable_testing()
 add_subdirectory(tests)
+else()
+message("Pixello tests disabled")
+endif()
