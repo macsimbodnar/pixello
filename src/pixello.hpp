@@ -10,6 +10,8 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 struct _TTF_Font;
+struct Mix_Music;
+struct Mix_Chunk;
 
 /*******************************************************************************
  * MACRO
@@ -195,6 +197,7 @@ public:
 
   texture_t load_image(const std::string& img_path);
   texture_t create_text(const std::string& text, const pixel_t& color);
+  
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }

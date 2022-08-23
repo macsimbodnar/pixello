@@ -1,4 +1,5 @@
 #include "pixello.hpp"
+#include <SDL_mixer.h>
 #include <iostream>
 #include "SDL_image.h"
 #include "SDL_render.h"
@@ -40,7 +41,7 @@ void pixello::init()
   int res;
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     throw init_exception("SDL could not initialize! SDL_Error: " +
                          std::string(SDL_GetError()));
   }
@@ -55,6 +56,12 @@ void pixello::init()
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
     throw init_exception("SDL_image could not initialize! SDL_image Error: " +
                          std::string(IMG_GetError()));
+  }
+
+  // Init SDL Mixer
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+    throw init_exception("SDL_mixer could not initialize! SDL_mixer Error: " +
+                         std::string(Mix_GetError()));
   }
 
   // Initialize SDL_ttf

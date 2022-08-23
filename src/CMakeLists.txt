@@ -16,3 +16,8 @@ target_link_libraries(pixello PRIVATE ${SDL2_IMAGE_LIBRARIES})
 find_package(SDL2_ttf REQUIRED)
 target_include_directories(pixello SYSTEM PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
 target_link_libraries(pixello PRIVATE ${SDL2_TTF_LIBRARIES})
+
+# SDL2_mixer
+find_package(SDL2_mixer REQUIRED)
+target_include_directories(pixello SYSTEM PRIVATE ${SDL2_MIXER_INCLUDE_DIRS})
+target_link_libraries(pixello PRIVATE ${SDL2_MIXER_LIBRARIES})
