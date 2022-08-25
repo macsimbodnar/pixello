@@ -329,15 +329,14 @@ void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
 
 texture_t pixello::load_image(const std::string& img_path)
 {
-  texture_t t;
-
   SDL_Texture* tmp_ptr = IMG_LoadTexture(_renderer, img_path.c_str());
 
-  if (tmp_ptr == NULL) {
+  if (!tmp_ptr) {
     throw load_exceptions("Unable to load image to texture: " + img_path +
                           "! SDL Error: " + std::string(IMG_GetError()));
   }
 
+  texture_t t;
   t._ptr = std::make_shared<sdl_texture_wrapper_t>(tmp_ptr);
 
   SDL_QueryTexture(t._ptr.get()->ptr, NULL, NULL, &t.w, &t.h);
@@ -348,7 +347,6 @@ texture_t pixello::load_image(const std::string& img_path)
 
 texture_t pixello::create_text(const std::string& text, const pixel_t& color)
 {
-  texture_t t;
   const SDL_Color c = {color.r, color.g, color.b, color.a};
 
   // Render text surface
@@ -360,16 +358,18 @@ texture_t pixello::create_text(const std::string& text, const pixel_t& color)
   }
 
   // Create texture from surface pixels
-  t._ptr = std::make_shared<sdl_texture_wrapper_t>(
-      SDL_CreateTextureFromSurface(_renderer, txt_surface));
+  auto tmp = SDL_CreateTextureFromSurface(_renderer, txt_surface);
 
-  if (!t._ptr) {
+  if (!tmp) {
     // Free the surface in any case
     SDL_FreeSurface(txt_surface);
 
     throw load_exceptions("Failed to generate the text texture: " + text +
                           " Error: " + std::string(TTF_GetError()));
   }
+
+  texture_t t;
+  t._ptr = std::make_shared<sdl_texture_wrapper_t>(tmp);
 
   // Get image dimensions
   t.w = txt_surface->w;
@@ -384,15 +384,15 @@ texture_t pixello::create_text(const std::string& text, const pixel_t& color)
 
 sound_t pixello::load_sound(const std::string& sound_path)
 {
-  sound_t sound;
+  auto tmp = Mix_LoadWAV(sound_path.c_str());
 
-  sound._ptr =
-      std::make_shared<sdl_sound_wrapper_t>(Mix_LoadWAV(sound_path.c_str()));
-
-  if (!sound._ptr) {
-    throw load_exceptions("Failed to load sound ! SDL_mixer Error: " +
-                          std::string(Mix_GetError()));
+  if (!tmp) {
+    throw load_exceptions("Failed to load sound! " + sound_path +
+                          ". SDL_mixer Error: " + std::string(Mix_GetError()));
   }
+
+  sound_t sound;
+  sound._ptr = std::make_shared<sdl_sound_wrapper_t>(tmp);
 
   return sound;
 }
@@ -400,15 +400,15 @@ sound_t pixello::load_sound(const std::string& sound_path)
 
 music_t pixello::load_music(const std::string& music_path)
 {
-  music_t music;
+  auto tmp = Mix_LoadMUS(music_path.c_str());
 
-  music._ptr =
-      std::make_shared<sdl_sound_wrapper_t>(Mix_LoadMUS(music_path.c_str()));
-
-  if (!music._ptr) {
-    throw load_exceptions("Failed to load music! SDL_mixer Error: " +
-                          std::string(Mix_GetError()));
+  if (!tmp) {
+    throw load_exceptions("Failed to load music! " + music_path +
+                          ". SDL_mixer Error: " + std::string(Mix_GetError()));
   }
+
+  music_t music;
+  music._ptr = std::make_shared<sdl_sound_wrapper_t>(tmp);
 
   return music;
 }
