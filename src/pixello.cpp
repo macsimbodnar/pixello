@@ -13,7 +13,23 @@
 
 sdl_texture_wrapper_t::~sdl_texture_wrapper_t()
 {
-  if (ptr) { SDL_DestroyTexture(ptr); }
+  if (ptr) {
+    SDL_DestroyTexture(ptr);
+    ptr = NULL;
+  }
+}
+
+sdl_sound_wrapper_t::~sdl_sound_wrapper_t()
+{
+  if (music_ptr) {
+    Mix_FreeMusic(music_ptr);
+    music_ptr = NULL;
+  }
+
+  if (chunk_ptr) {
+    Mix_FreeChunk(chunk_ptr);
+    chunk_ptr = NULL;
+  }
 }
 
 
@@ -27,6 +43,8 @@ pixello::~pixello()
   if (_renderer) { SDL_DestroyRenderer(_renderer); }
   if (_window) { SDL_DestroyWindow(_window); }
 
+  Mix_Quit();
+  IMG_Quit();
   SDL_Quit();
 }
 
@@ -269,6 +287,34 @@ void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y)
 }
 
 
+void pixello::music_do(music_t::action_t action, const music_t& music)
+{
+  switch (action) {
+    case music_t::PLAY:
+      Mix_PlayMusic(music.pointer(), -1);
+      break;
+
+    case music_t::PAUSE:
+      Mix_PausedMusic();
+      break;
+
+    case music_t::RESUME:
+      Mix_ResumeMusic();
+      break;
+
+    case music_t::STOP:
+      Mix_HaltMusic();
+      break;
+  }
+}
+
+
+void pixello::play_sound(const sound_t& sound)
+{
+  Mix_PlayChannel(-1, sound.pointer(), 0);
+}
+
+
 void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
 {
   // Set viewport
@@ -333,6 +379,38 @@ texture_t pixello::create_text(const std::string& text, const pixel_t& color)
   SDL_FreeSurface(txt_surface);
 
   return t;
+}
+
+
+sound_t pixello::load_sound(const std::string& sound_path)
+{
+  sound_t sound;
+
+  sound._ptr =
+      std::make_shared<sdl_sound_wrapper_t>(Mix_LoadWAV(sound_path.c_str()));
+
+  if (!sound._ptr) {
+    throw load_exceptions("Failed to load sound ! SDL_mixer Error: " +
+                          std::string(Mix_GetError()));
+  }
+
+  return sound;
+}
+
+
+music_t pixello::load_music(const std::string& music_path)
+{
+  music_t music;
+
+  music._ptr =
+      std::make_shared<sdl_sound_wrapper_t>(Mix_LoadMUS(music_path.c_str()));
+
+  if (!music._ptr) {
+    throw load_exceptions("Failed to load music! SDL_mixer Error: " +
+                          std::string(Mix_GetError()));
+  }
+
+  return music;
 }
 
 

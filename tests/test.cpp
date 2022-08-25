@@ -8,6 +8,9 @@ texture_t media2;
 int32_t media2_x;
 int32_t media2_y;
 
+sound_t sound;
+music_t music;
+
 bool holding_icon;
 int32_t holding_offset_x;
 int32_t holding_offset_y;
@@ -57,6 +60,9 @@ private:
     holding_icon = false;
     holding_offset_x = 0;
     holding_offset_y = 0;
+
+    music = load_music("assets/sound/doom.wav");
+    sound = load_sound("assets/sound/dspunch.wav");
   }
 
   void on_update(void* data) override
@@ -134,7 +140,8 @@ private:
     draw_texture(media1, {10, 10, 300, 193});
 
     // Text
-    set_current_viewport({800 - 320, 800 - 213, 320, 213});
+    rect_t gray_viewport = {800 - 320, 800 - 213, 320, 213};
+    set_current_viewport(gray_viewport);
     p.n = 0xFF0000FF;
 
     // PRINT FPS
@@ -178,6 +185,12 @@ private:
     draw_texture(did_mouse_moved_texture, 0, y_draw_offset);
 
     y_draw_offset += did_mouse_moved_texture.h;
+
+    // Sound
+    if (is_mouse_in(gray_viewport)) {
+      if (mouse_state().left_button.click) { play_sound(sound); }
+      if (mouse_state().right_button.click) { music_do(music_t::PLAY, music); }
+    }
   }
 };
 

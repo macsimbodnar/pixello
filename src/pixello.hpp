@@ -10,7 +10,7 @@ struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
 struct _TTF_Font;
-struct Mix_Music;
+struct _Mix_Music;
 struct Mix_Chunk;
 
 /*******************************************************************************
@@ -53,6 +53,8 @@ struct sdl_texture_wrapper_t
 {
   SDL_Texture* ptr = NULL;
 
+  sdl_texture_wrapper_t() = delete;
+
   sdl_texture_wrapper_t(SDL_Texture* p) : ptr(p) {}
   ~sdl_texture_wrapper_t();
 };
@@ -66,6 +68,41 @@ struct texture_t
 
   texture_t() {}
   inline SDL_Texture* pointer() const { return _ptr.get()->ptr; }
+};
+
+struct sdl_sound_wrapper_t
+{
+  _Mix_Music* music_ptr = NULL;
+  Mix_Chunk* chunk_ptr = NULL;
+
+  sdl_sound_wrapper_t() = delete;
+  sdl_sound_wrapper_t(_Mix_Music* p) : music_ptr(p), chunk_ptr(NULL) {}
+  sdl_sound_wrapper_t(Mix_Chunk* p) : music_ptr(NULL), chunk_ptr(p) {}
+  ~sdl_sound_wrapper_t();
+};
+
+struct sound_t
+{
+  std::shared_ptr<sdl_sound_wrapper_t> _ptr;
+
+  sound_t() {}
+  inline Mix_Chunk* pointer() const { return _ptr.get()->chunk_ptr; }
+};
+
+struct music_t
+{
+  enum action_t
+  {
+    PLAY,
+    PAUSE,
+    RESUME,
+    STOP
+  };
+
+  std::shared_ptr<sdl_sound_wrapper_t> _ptr;
+
+  music_t() {}
+  inline _Mix_Music* pointer() const { return _ptr.get()->music_ptr; }
 };
 
 struct config_t
@@ -195,9 +232,14 @@ public:
   void draw_texture(const texture_t& t, int32_t x, int32_t y);
   void draw_texture(const texture_t& t, const rect_t& rect);
 
+  void music_do(music_t::action_t action, const music_t& music);
+  void play_sound(const sound_t& sound);
+
   texture_t load_image(const std::string& img_path);
   texture_t create_text(const std::string& text, const pixel_t& color);
-  
+  sound_t load_sound(const std::string& sound_path);
+  music_t load_music(const std::string& music_path);
+
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }
   inline int32_t height_in_pixels() const { return _config.height_in_pixels; }
