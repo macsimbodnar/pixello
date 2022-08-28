@@ -4,7 +4,6 @@
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_ttf.h"
-#include "exceptions.hpp"
 
 
 /*******************************************************************************
