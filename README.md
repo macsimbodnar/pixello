@@ -25,13 +25,13 @@
 
 ```bash
 # Install dependencies
-sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-gfx-dev
 ```
 
 ### How to install on Arch
 
 ```bash
-sudo pacman -Sy sdl2 sdl2_image sdl2_ttf  sdl2_mixer
+sudo pacman -Sy sdl2 sdl2_image sdl2_ttf sdl2_mixer sdl2_gfx
 
 ```
 
@@ -39,7 +39,7 @@ sudo pacman -Sy sdl2 sdl2_image sdl2_ttf  sdl2_mixer
 
 ```bash
 # Install dependencies
-brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer
+brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer sdl2_gfx
 ```
 
 ## How to compile
@@ -60,3 +60,7 @@ make
 # Run tests
 ctest --verbose
 ```
+
+## Useful links
+
+* [Cmake SDL2 modules](https://github.com/aminosbh/sdl2-cmake-modules)

@@ -256,6 +256,8 @@ public:
   void draw_texture(const texture_t& t, int32_t x, int32_t y);
   void draw_texture(const texture_t& t, const rect_t& rect);
 
+  void draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color);
+
   void music_do(music_t::action_t action, const music_t& music);
   void play_sound(const sound_t& sound);
 

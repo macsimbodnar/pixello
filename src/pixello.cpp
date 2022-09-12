@@ -1,6 +1,7 @@
 #include "pixello.hpp"
 #include <SDL_mixer.h>
 #include <iostream>
+#include "SDL2_gfxPrimitives.h"
 #include "SDL_image.h"
 #include "SDL_render.h"
 #include "SDL_ttf.h"
@@ -419,4 +420,10 @@ bool pixello::is_mouse_in(const rect_t& rect) const
           (_mouse_state.y >= rect.y) && (_mouse_state.y < (rect.y + rect.h)))
              ? true
              : false;
+}
+
+
+void pixello::draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color)
+{
+  filledCircleRGBA(_renderer, x, y, r, color.r, color.g, color.b, color.a);
 }

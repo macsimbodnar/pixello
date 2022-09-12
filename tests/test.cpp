@@ -135,6 +135,9 @@ private:
     // Draw texture with transparency
     draw_texture(media2, media2_x, media2_y);
 
+    // Draw circle
+    draw_circle(800 - 50, 50, 50, 0xFF0000FF);
+
     // View port, Images
     set_current_viewport({0, 0, 320, 213}, 0x00FF0055);
     draw_texture(media1, {10, 10, 300, 193});
