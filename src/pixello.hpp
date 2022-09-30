@@ -249,22 +249,22 @@ public:
   bool run();
 
   // Routines
-  void draw_pixel(int32_t x, int32_t y, const pixel_t& p);
-  void draw_rect(const rect_t& rect, const pixel_t& p);
-  void clear_screen(const pixel_t& p);
+  void draw_pixel(const int32_t x, const int32_t y, const pixel_t& p) const;
+  void draw_rect(const rect_t& rect, const pixel_t& p) const;
+  void clear_screen(const pixel_t& p) const;
 
-  void draw_texture(const texture_t& t, int32_t x, int32_t y);
-  void draw_texture(const texture_t& t, const rect_t& rect);
+  void draw_texture(const texture_t& t, int32_t x, int32_t y) const;
+  void draw_texture(const texture_t& t, const rect_t& rect) const;
 
-  void draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color);
+  void draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color) const;
 
-  void music_do(music_t::action_t action, const music_t& music);
-  void play_sound(const sound_t& sound);
+  void music_do(music_t::action_t action, const music_t& music) const;
+  void play_sound(const sound_t& sound) const;
 
-  texture_t load_image(const std::string& img_path);
-  texture_t create_text(const std::string& text, const pixel_t& color);
-  sound_t load_sound(const std::string& sound_path);
-  music_t load_music(const std::string& music_path);
+  texture_t load_image(const std::string& img_path) const;
+  texture_t create_text(const std::string& text, const pixel_t& color) const;
+  sound_t load_sound(const std::string& sound_path) const;
+  music_t load_music(const std::string& music_path) const;
 
 
   inline int32_t width_in_pixels() const { return _config.width_in_pixels; }

@@ -251,7 +251,9 @@ bool pixello::run()
 }
 
 
-void pixello::draw_pixel(int32_t x, int32_t y, const pixel_t& p)
+void pixello::draw_pixel(const int32_t x,
+                         const int32_t y,
+                         const pixel_t& p) const
 {
   SDL_Rect rect = {x * _config.pixel_size, y * _config.pixel_size,
                    _config.pixel_size, _config.pixel_size};
@@ -260,34 +262,34 @@ void pixello::draw_pixel(int32_t x, int32_t y, const pixel_t& p)
   SDL_RenderFillRect(_renderer, &rect);
 }
 
-void pixello::draw_rect(const rect_t& rect, const pixel_t& p)
+void pixello::draw_rect(const rect_t& rect, const pixel_t& p) const
 {
   SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
   SDL_RenderFillRect(_renderer, (SDL_Rect*)&rect);
 }
 
 
-void pixello::clear_screen(const pixel_t& p)
+void pixello::clear_screen(const pixel_t& p) const
 {
   SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
   SDL_RenderClear(_renderer);
 }
 
 
-void pixello::draw_texture(const texture_t& t, const rect_t& rect)
+void pixello::draw_texture(const texture_t& t, const rect_t& rect) const
 {
   SDL_RenderCopy(_renderer, t.pointer(), NULL, (SDL_Rect*)&rect);
 }
 
 
-void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y)
+void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y) const
 {
   const rect_t rect = {x, y, t.w, t.h};
   draw_texture(t, rect);
 }
 
 
-void pixello::music_do(music_t::action_t action, const music_t& music)
+void pixello::music_do(music_t::action_t action, const music_t& music) const
 {
   switch (action) {
     case music_t::PLAY:
@@ -309,7 +311,7 @@ void pixello::music_do(music_t::action_t action, const music_t& music)
 }
 
 
-void pixello::play_sound(const sound_t& sound)
+void pixello::play_sound(const sound_t& sound) const
 {
   Mix_PlayChannel(-1, sound.pointer(), 0);
 }
@@ -327,7 +329,7 @@ void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
 }
 
 
-texture_t pixello::load_image(const std::string& img_path)
+texture_t pixello::load_image(const std::string& img_path) const
 {
   SDL_Texture* tmp_ptr = IMG_LoadTexture(_renderer, img_path.c_str());
 
@@ -345,7 +347,8 @@ texture_t pixello::load_image(const std::string& img_path)
 }
 
 
-texture_t pixello::create_text(const std::string& text, const pixel_t& color)
+texture_t pixello::create_text(const std::string& text,
+                               const pixel_t& color) const
 {
   const SDL_Color c = {color.r, color.g, color.b, color.a};
 
@@ -382,7 +385,7 @@ texture_t pixello::create_text(const std::string& text, const pixel_t& color)
 }
 
 
-sound_t pixello::load_sound(const std::string& sound_path)
+sound_t pixello::load_sound(const std::string& sound_path) const
 {
   auto tmp = Mix_LoadWAV(sound_path.c_str());
 
@@ -398,7 +401,7 @@ sound_t pixello::load_sound(const std::string& sound_path)
 }
 
 
-music_t pixello::load_music(const std::string& music_path)
+music_t pixello::load_music(const std::string& music_path) const
 {
   auto tmp = Mix_LoadMUS(music_path.c_str());
 
@@ -423,7 +426,10 @@ bool pixello::is_mouse_in(const rect_t& rect) const
 }
 
 
-void pixello::draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color)
+void pixello::draw_circle(int32_t x,
+                          int32_t y,
+                          int32_t r,
+                          const pixel_t& color) const
 {
   filledCircleRGBA(_renderer, x, y, r, color.r, color.g, color.b, color.a);
 }
