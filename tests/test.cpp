@@ -49,6 +49,8 @@ public:
 private:
   void log(const std::string& msg) override { std::cout << msg << std::endl; }
 
+  void on_click() { log("Click!"); }
+
   void on_init(void* data) override
   {
     media1 = load_image("assets/sample_640x426.bmp");
@@ -113,7 +115,8 @@ private:
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
-    if (is_mouse_in(r) && (mouse_state().left_button.state == button_key_t::DOWN)) {
+    if (is_mouse_in(r) &&
+        (mouse_state().left_button.state == button_key_t::DOWN)) {
       if (!holding_icon) {
         holding_offset_x = mouse_state().x - media2_x;
         holding_offset_y = mouse_state().y - media2_y;
@@ -188,6 +191,14 @@ private:
     draw_texture(did_mouse_moved_texture, 0, y_draw_offset);
 
     y_draw_offset += did_mouse_moved_texture.h;
+
+    // Button
+    button_t button =
+        create_button(gray_viewport, {0, 100, 100, 30}, 0xFFFFFFFF, "Button",
+                      [&]() { log("Click!"); });
+
+    on_click_button(button);
+    draw_button(button);
 
     // Sound
     if (is_mouse_in(gray_viewport)) {

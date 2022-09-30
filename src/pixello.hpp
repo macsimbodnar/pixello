@@ -306,12 +306,12 @@ public:
 
   bool is_mouse_in(const rect_t& rect) const;
 
-  inline button_t create_button(const rect_t& viewport,
-                                const rect_t& button_rect,
-                                const pixel_t button_color,
-                                const std::string& button_text,
-                                const std::function<void()> on_click) const;
+  button_t create_button(const rect_t& viewport,
+                         const rect_t& button_rect,
+                         const pixel_t button_color,
+                         const std::string& button_text,
+                         const std::function<void()> on_click) const;
 
-  inline void draw_button(const button_t& b) const;
-  inline void on_click_button(button_t& b) const;
+  void draw_button(const button_t& b) const;
+  void on_click_button(button_t& b) const;
 };

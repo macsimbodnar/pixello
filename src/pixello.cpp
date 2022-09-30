@@ -458,8 +458,10 @@ button_t pixello::create_button(const rect_t& viewport,
 
   button.text_rect.w = button.text_texture.w;
   button.text_rect.h = button.text_texture.h;
-  button.text_rect.x = (button_rect.w - button.text_texture.w) / 2;
-  button.text_rect.x = (button_rect.h - button.text_texture.h) / 2;
+  button.text_rect.x =
+      button_rect.x + ((button_rect.w - button.text_texture.w) / 2);
+  button.text_rect.y =
+      button_rect.y + ((button_rect.h - button.text_texture.h) / 2);
 
   return button;
 }
@@ -468,9 +470,9 @@ button_t pixello::create_button(const rect_t& viewport,
 void pixello::draw_button(const button_t& b) const
 {
   draw_rect(b.rect, b.color);
-  draw_texture(b.text_texture, b.text_rect);
+  if (b.hover) { draw_rect(b.rect, 0xAAAAAA33); }
 
-  if (b.hover) { draw_rect(b.rect, 0x55555555); }
+  draw_texture(b.text_texture, b.text_rect);
 }
 
 
