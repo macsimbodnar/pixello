@@ -436,3 +436,52 @@ void pixello::draw_circle(const int32_t x,
 {
   filledCircleRGBA(_renderer, x, y, r, color.r, color.g, color.b, color.a);
 }
+
+
+button_t pixello::create_button(const rect_t& viewport,
+                                const rect_t& button_rect,
+                                const pixel_t button_color,
+                                const std::string& button_text,
+                                const std::function<void()> on_click) const
+{
+  button_t button;
+  button.hover = false;
+  button.color = button_color;
+  button.rect = button_rect;
+  button.on_click = on_click;
+  button.text_texture = create_text(button_text, 0x000000FF);
+
+  button.with_viewport.w = button_rect.w;
+  button.with_viewport.h = button_rect.h;
+  button.with_viewport.x = button_rect.x + viewport.x;
+  button.with_viewport.y = button_rect.y + viewport.y;
+
+  button.text_rect.w = button.text_texture.w;
+  button.text_rect.h = button.text_texture.h;
+  button.text_rect.x = (button_rect.w - button.text_texture.w) / 2;
+  button.text_rect.x = (button_rect.h - button.text_texture.h) / 2;
+
+  return button;
+}
+
+
+void pixello::draw_button(const button_t& b) const
+{
+  draw_rect(b.rect, b.color);
+  draw_texture(b.text_texture, b.text_rect);
+
+  if (b.hover) { draw_rect(b.rect, 0x55555555); }
+}
+
+
+void pixello::on_click_button(button_t& b) const
+{
+  const auto mouse = mouse_state();
+
+  if (is_mouse_in(b.with_viewport)) {
+    b.hover = true;
+    if (mouse.left_button.click) { b.on_click(); }
+  } else {
+    b.hover = false;
+  }
+}
