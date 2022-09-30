@@ -176,6 +176,7 @@ bool pixello::run()
                     event.button.clicks == 1 ? true : false;
                 _mouse_state.right_button.double_click =
                     event.button.clicks == 2 ? true : false;
+                break;
               case SDL_BUTTON_MIDDLE:
                 _mouse_state.central_button.state = button_key_t::DOWN;
                 _mouse_state.central_button.click =
