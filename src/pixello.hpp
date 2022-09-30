@@ -70,7 +70,7 @@ struct pixel_t
   pixel_t() : n(0x000000FF) {}
   pixel_t(uint32_t color) : n(color) {}
   pixel_t(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
-      : r(red), g(green), b(blue), a(alpha)
+      : a(alpha), b(blue), g(green), r(red)
   {}
 };
 
@@ -213,7 +213,7 @@ class pixello
 {
 private:
   uint32_t _FPS = 0;
-  mouse_t _mouse_state = {0};
+  mouse_t _mouse_state;
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;

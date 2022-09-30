@@ -55,9 +55,6 @@ void pixello::log(const std::string& msg)
 
 void pixello::init()
 {
-  // INITIALIZATION
-  int res;
-
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     throw init_exception("SDL could not initialize! SDL_Error: " +

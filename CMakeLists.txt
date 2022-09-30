@@ -8,6 +8,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 option(PIXELLO_ENABLE_TESTS "Enable testing" ON)
 
+# Add extra compiler checks
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-Wall -Wextra -Werror)
+endif()
+
 add_subdirectory(src)
 
 if(PIXELLO_ENABLE_TESTS)

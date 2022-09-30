@@ -51,7 +51,7 @@ private:
 
   void on_click() { log("Click!"); }
 
-  void on_init(void* data) override
+  void on_init(void*) override
   {
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
@@ -67,7 +67,7 @@ private:
     sound = load_sound("assets/sound/dspunch.wav");
   }
 
-  void on_update(void* data) override
+  void on_update(void*) override
   {
     clear_screen(0x000000FF);
 
