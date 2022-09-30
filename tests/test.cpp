@@ -18,14 +18,14 @@ int32_t holding_offset_y;
 uint32_t click_counter = 0;
 uint32_t double_click_counter = 0;
 
-std::string pos_str(button_t::state_t s)
+std::string pos_str(button_key_t::state_t s)
 {
   std::string res = "";
   switch (s) {
-    case button_t::DOWN:
+    case button_key_t::DOWN:
       res = "down";
       break;
-    case button_t::UP:
+    case button_key_t::UP:
       res = "up";
       break;
   }
@@ -113,7 +113,7 @@ private:
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
-    if (is_mouse_in(r) && (mouse_state().left_button.state == button_t::DOWN)) {
+    if (is_mouse_in(r) && (mouse_state().left_button.state == button_key_t::DOWN)) {
       if (!holding_icon) {
         holding_offset_x = mouse_state().x - media2_x;
         holding_offset_y = mouse_state().y - media2_y;
@@ -121,7 +121,7 @@ private:
       holding_icon = true;
     }
 
-    if (mouse_state().left_button.state == button_t::UP) {
+    if (mouse_state().left_button.state == button_key_t::UP) {
       holding_icon = false;
       holding_offset_x = 0;
       holding_offset_y = 0;
@@ -161,11 +161,11 @@ private:
 
     y_draw_offset += mouse_pos_texture.h;
 
-    texture_t left_button_texture =
+    texture_t left_button_key_texture =
         create_text("MLB: " + pos_str(state.left_button.state), p);
-    draw_texture(left_button_texture, 0, y_draw_offset);
+    draw_texture(left_button_key_texture, 0, y_draw_offset);
 
-    y_draw_offset += left_button_texture.h;
+    y_draw_offset += left_button_key_texture.h;
 
     if (mouse_state().left_button.click) { ++click_counter; }
 

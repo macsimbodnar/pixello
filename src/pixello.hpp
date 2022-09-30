@@ -169,7 +169,7 @@ struct config_t
   }
 };
 
-struct key_t
+struct button_key_t
 {
   enum state_t
   {
@@ -188,9 +188,9 @@ struct mouse_t
   int32_t y = 0;
   bool did_mouse_moved = false;
 
-  key_t left_button;
-  key_t central_button;
-  key_t right_button;
+  button_key_t left_button;
+  button_key_t central_button;
+  button_key_t right_button;
 };
 
 /*******************************************************************************
