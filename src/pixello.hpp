@@ -169,7 +169,7 @@ struct config_t
   }
 };
 
-struct button_t
+struct key_t
 {
   enum state_t
   {
@@ -188,9 +188,9 @@ struct mouse_t
   int32_t y = 0;
   bool did_mouse_moved = false;
 
-  button_t left_button;
-  button_t central_button;
-  button_t right_button;
+  key_t left_button;
+  key_t central_button;
+  key_t right_button;
 };
 
 /*******************************************************************************
@@ -253,12 +253,15 @@ public:
   void draw_rect(const rect_t& rect, const pixel_t& p) const;
   void clear_screen(const pixel_t& p) const;
 
-  void draw_texture(const texture_t& t, int32_t x, int32_t y) const;
+  void draw_texture(const texture_t& t, const int32_t x, const int32_t y) const;
   void draw_texture(const texture_t& t, const rect_t& rect) const;
 
-  void draw_circle(int32_t x, int32_t y, int32_t r, const pixel_t& color) const;
+  void draw_circle(const int32_t x,
+                   const int32_t y,
+                   const int32_t r,
+                   const pixel_t& color) const;
 
-  void music_do(music_t::action_t action, const music_t& music) const;
+  void music_do(const music_t::action_t action, const music_t& music) const;
   void play_sound(const sound_t& sound) const;
 
   texture_t load_image(const std::string& img_path) const;

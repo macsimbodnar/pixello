@@ -167,20 +167,20 @@ bool pixello::run()
           case SDL_MOUSEBUTTONDOWN:
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
-                _mouse_state.left_button.state = button_t::DOWN;
+                _mouse_state.left_button.state = key_t::DOWN;
                 _mouse_state.left_button.click =
                     event.button.clicks == 1 ? true : false;
                 _mouse_state.left_button.double_click =
                     event.button.clicks == 2 ? true : false;
                 break;
               case SDL_BUTTON_RIGHT:
-                _mouse_state.right_button.state = button_t::DOWN;
+                _mouse_state.right_button.state = key_t::DOWN;
                 _mouse_state.right_button.click =
                     event.button.clicks == 1 ? true : false;
                 _mouse_state.right_button.double_click =
                     event.button.clicks == 2 ? true : false;
               case SDL_BUTTON_MIDDLE:
-                _mouse_state.central_button.state = button_t::DOWN;
+                _mouse_state.central_button.state = key_t::DOWN;
                 _mouse_state.central_button.click =
                     event.button.clicks == 1 ? true : false;
                 _mouse_state.central_button.double_click =
@@ -192,13 +192,13 @@ bool pixello::run()
           case SDL_MOUSEBUTTONUP:
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
-                _mouse_state.left_button.state = button_t::UP;
+                _mouse_state.left_button.state = key_t::UP;
                 break;
               case SDL_BUTTON_RIGHT:
-                _mouse_state.right_button.state = button_t::UP;
+                _mouse_state.right_button.state = key_t::UP;
                 break;
               case SDL_BUTTON_MIDDLE:
-                _mouse_state.central_button.state = button_t::UP;
+                _mouse_state.central_button.state = key_t::UP;
                 break;
             }
             break;
@@ -282,14 +282,17 @@ void pixello::draw_texture(const texture_t& t, const rect_t& rect) const
 }
 
 
-void pixello::draw_texture(const texture_t& t, int32_t x, int32_t y) const
+void pixello::draw_texture(const texture_t& t,
+                           const int32_t x,
+                           const int32_t y) const
 {
   const rect_t rect = {x, y, t.w, t.h};
   draw_texture(t, rect);
 }
 
 
-void pixello::music_do(music_t::action_t action, const music_t& music) const
+void pixello::music_do(const music_t::action_t action,
+                       const music_t& music) const
 {
   switch (action) {
     case music_t::PLAY:
@@ -426,9 +429,9 @@ bool pixello::is_mouse_in(const rect_t& rect) const
 }
 
 
-void pixello::draw_circle(int32_t x,
-                          int32_t y,
-                          int32_t r,
+void pixello::draw_circle(const int32_t x,
+                          const int32_t y,
+                          const int32_t r,
                           const pixel_t& color) const
 {
   filledCircleRGBA(_renderer, x, y, r, color.r, color.g, color.b, color.a);
