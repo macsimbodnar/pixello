@@ -206,6 +206,9 @@ bool pixello::run()
       // Reset the viewport to entire window
       SDL_RenderSetViewport(_renderer, NULL);
 
+      // Set the alpha channel blend mode
+      SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
+
       // USER UPDATE
       on_update(_external_data);
 

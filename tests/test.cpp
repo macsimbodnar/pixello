@@ -139,7 +139,7 @@ private:
     draw_texture(media2, media2_x, media2_y);
 
     // Draw circle
-    draw_circle(800 - 50, 50, 50, 0xFF0000FF);
+    draw_circle(800 - 50, 50, 50, 0xFF000055);
 
     // View port, Images
     set_current_viewport({0, 0, 320, 213}, 0x00FF0055);
