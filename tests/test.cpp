@@ -112,6 +112,21 @@ private:
     rect_t center = {width() / 2 - 100, height() / 2 - 100, 200, 200};
     draw_rect(center, 0xFF00FFFF);
 
+    // Draw rect outline
+    center = {width() / 2 - 90, height() / 2 - 90, 180, 180};
+    draw_rect_outline(center, 0x000000FF);
+
+    // Draw H line
+    point_t a = {0, height() / 2};
+    point_t b = {width(), height() / 2};
+    draw_line(a, b, 0xFFFFFFFF);
+
+    // Draw dots
+    int num_of_dots = 10;
+    for (int i = 0; i < num_of_dots; ++i) {
+      point_t p = {width() / 2 - 80 + (i * 10), height() / 2 - 80};
+      draw_dot(p, 0xFFFFFFFF);
+    } 
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
@@ -154,6 +169,11 @@ private:
     uint32_t fps = FPS();
     texture_t FPS = create_text("FPS: " + STR(fps), p);
     draw_texture(FPS, 320 - FPS.w, 0);
+
+    // Print Delta T
+    uint64_t dt = delta_time();
+    texture_t DT = create_text("DT: " + STR(dt), p);
+    draw_texture(DT, 320 - DT.w, FPS.h + 2);
 
     int32_t y_draw_offset = 0;
     // Mouse

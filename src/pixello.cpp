@@ -134,11 +134,14 @@ bool pixello::run()
     bool running = true;
     uint32_t FPS_counter = 0;
     uint64_t FPS_last_check = SDL_GetPerformanceCounter();
+    uint64_t start = SDL_GetPerformanceCounter();
     /*************************************************************
      *                          MAIN LOOP                        *
      *************************************************************/
     while (running) {
-      const uint64_t start = SDL_GetPerformanceCounter();
+      const uint64_t now = SDL_GetPerformanceCounter();
+      dt = now - start;
+      start = now;
 
       // Reset did mouse moved flag
       _mouse_state.did_mouse_moved = false;
@@ -263,10 +266,34 @@ void pixello::draw_pixel(const int32_t x,
   SDL_RenderFillRect(_renderer, &rect);
 }
 
+
 void pixello::draw_rect(const rect_t& rect, const pixel_t& p) const
 {
   SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
   SDL_RenderFillRect(_renderer, (SDL_Rect*)&rect);
+}
+
+
+void pixello::draw_rect_outline(const rect_t& rect, const pixel_t& p) const
+{
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderDrawRect(_renderer, (SDL_Rect*)&rect);
+}
+
+
+void pixello::draw_line(const point_t& a,
+                        const point_t& b,
+                        const pixel_t& p) const
+{
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderDrawLine(_renderer, a.x, a.y, b.x, b.y);
+}
+
+
+void pixello::draw_dot(const point_t& a, const pixel_t& p) const
+{
+  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
+  SDL_RenderDrawPoint(_renderer, a.x, a.y);
 }
 
 

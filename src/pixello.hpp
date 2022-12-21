@@ -47,6 +47,12 @@ struct Mix_Chunk;
 /*******************************************************************************
  * STRUCTS
  ******************************************************************************/
+struct point_t
+{
+  int x;
+  int y;
+};
+
 struct rect_t
 {
   int x, y;
@@ -213,6 +219,7 @@ class pixello
 {
 private:
   uint32_t _FPS = 0;
+  uint64_t dt;  // time form the last frame
   mouse_t _mouse_state;
 
   SDL_Window* _window = NULL;
@@ -264,6 +271,9 @@ public:
   // Routines
   void draw_pixel(const int32_t x, const int32_t y, const pixel_t& p) const;
   void draw_rect(const rect_t& rect, const pixel_t& p) const;
+  void draw_line(const point_t& a, const point_t& b, const pixel_t& p) const;
+  void draw_dot(const point_t& a, const pixel_t& p) const;
+  void draw_rect_outline(const rect_t& rect, const pixel_t& p) const;
   void clear_screen(const pixel_t& p) const;
 
   void draw_texture(const texture_t& t, const int32_t x, const int32_t y) const;
@@ -300,6 +310,7 @@ public:
   }
 
   inline uint32_t FPS() const { return _FPS; }
+  inline uint64_t delta_time() const { return dt; }
 
   void set_current_viewport(const rect_t& rect,
                             const pixel_t& color = {0x555555FF});
