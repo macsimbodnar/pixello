@@ -173,6 +173,19 @@ bool pixello::run()
                 _inputs.s.pressed = true;
                 break;
 
+              case SDL_SCANCODE_UP:
+                _inputs.up.pressed = true;
+                break;
+              case SDL_SCANCODE_DOWN:
+                _inputs.down.pressed = true;
+                break;
+              case SDL_SCANCODE_LEFT:
+                _inputs.left.pressed = true;
+                break;
+              case SDL_SCANCODE_RIGHT:
+                _inputs.right.pressed = true;
+                break;
+
               default:
                 break;
             }
@@ -192,6 +205,20 @@ bool pixello::run()
               case SDL_SCANCODE_S:
                 _inputs.s.pressed = false;
                 break;
+
+              case SDL_SCANCODE_UP:
+                _inputs.up.pressed = false;
+                break;
+              case SDL_SCANCODE_DOWN:
+                _inputs.down.pressed = false;
+                break;
+              case SDL_SCANCODE_LEFT:
+                _inputs.left.pressed = false;
+                break;
+              case SDL_SCANCODE_RIGHT:
+                _inputs.right.pressed = false;
+                break;
+
 
               default:
                 break;

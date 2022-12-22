@@ -215,6 +215,11 @@ struct inputs_t
   key_input_t d;
   key_input_t w;
   key_input_t s;
+
+  key_input_t left;
+  key_input_t right;
+  key_input_t up;
+  key_input_t down;
 };
 
 
