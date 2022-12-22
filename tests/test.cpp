@@ -126,7 +126,7 @@ private:
     for (int i = 0; i < num_of_dots; ++i) {
       point_t p = {width() / 2 - 80 + (i * 10), height() / 2 - 80};
       draw_dot(p, 0xFFFFFFFF);
-    } 
+    }
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
@@ -174,6 +174,28 @@ private:
     uint64_t dt = delta_time();
     texture_t DT = create_text("DT: " + STR(dt), p);
     draw_texture(DT, 320 - DT.w, FPS.h + 2);
+
+    // Print WASD KEYS
+    inputs_t inputs = inputs_state();
+    if (inputs.w.pressed) {
+      texture_t T = create_text("W", p);
+      draw_texture(T, 0, 213 - T.h);
+    }
+    if (inputs.s.pressed) {
+      texture_t T = create_text("S", p);
+      draw_texture(T, 20, 213 - T.h);
+    }
+
+    if (inputs.a.pressed) {
+      texture_t T = create_text("A", p);
+      draw_texture(T, 40, 213 - T.h);
+    }
+
+    if (inputs.d.pressed) {
+      texture_t T = create_text("D", p);
+      draw_texture(T, 60, 213 - T.h);
+    }
+
 
     int32_t y_draw_offset = 0;
     // Mouse

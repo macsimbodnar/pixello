@@ -153,12 +153,52 @@ bool pixello::run()
             running = false;
             break;
 
-          case SDL_KEYDOWN:
-            if (SDL_SCANCODE_ESCAPE == event.key.keysym.scancode) {
-              running = false;
-            }
-            break;
+          // KEY SECTION
+          case SDL_KEYDOWN: {
+            switch (event.key.keysym.scancode) {
+              case SDL_SCANCODE_ESCAPE:
+                running = false;
+                break;
 
+              case SDL_SCANCODE_A:
+                _inputs.a.pressed = true;
+                break;
+              case SDL_SCANCODE_D:
+                _inputs.d.pressed = true;
+                break;
+              case SDL_SCANCODE_W:
+                _inputs.w.pressed = true;
+                break;
+              case SDL_SCANCODE_S:
+                _inputs.s.pressed = true;
+                break;
+
+              default:
+                break;
+            }
+          } break;
+
+          case SDL_KEYUP: {
+            switch (event.key.keysym.scancode) {
+              case SDL_SCANCODE_A:
+                _inputs.a.pressed = false;
+                break;
+              case SDL_SCANCODE_D:
+                _inputs.d.pressed = false;
+                break;
+              case SDL_SCANCODE_W:
+                _inputs.w.pressed = false;
+                break;
+              case SDL_SCANCODE_S:
+                _inputs.s.pressed = false;
+                break;
+
+              default:
+                break;
+            }
+          } break;
+
+          // MOUSE SECTION
           case SDL_MOUSEMOTION:
             SDL_GetMouseState(&_mouse_state.x, &_mouse_state.y);
             _mouse_state.did_mouse_moved = true;

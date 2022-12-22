@@ -201,6 +201,23 @@ struct mouse_t
 };
 
 
+struct key_input_t
+{
+  bool pressed;
+
+  key_input_t() : pressed(false) {}
+};
+
+
+struct inputs_t
+{
+  key_input_t a;
+  key_input_t d;
+  key_input_t w;
+  key_input_t s;
+};
+
+
 struct button_t
 {
   rect_t rect;
@@ -221,6 +238,7 @@ private:
   uint32_t _FPS = 0;
   uint64_t dt;  // time form the last frame
   mouse_t _mouse_state;
+  inputs_t _inputs;
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
@@ -298,6 +316,7 @@ public:
   inline int32_t width() const { return _config.window_w; }
   inline int32_t height() const { return _config.window_h; }
   inline mouse_t mouse_state() const { return _mouse_state; }
+  inline inputs_t inputs_state() const { return _inputs; }
 
   inline void mouse_reset_clicks()
   {
