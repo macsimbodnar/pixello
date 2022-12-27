@@ -154,6 +154,8 @@ struct config_t
   std::string font_path;
   int32_t font_size;
 
+  pixel_t background_color;
+
   config_t(uint32_t ps,
            uint32_t ww,
            uint32_t wh,
@@ -172,7 +174,10 @@ struct config_t
         font_path(std::move(font)),
         font_size(font_s)
   {
-    if (pixel_size < 1) { pixel_size = 1; }
+    if (pixel_size < 1) {
+      pixel_size = 1;
+      background_color = 0x000000FF;
+    }
   }
 };
 
@@ -297,10 +302,12 @@ public:
   void draw_line(const point_t& a, const point_t& b, const pixel_t& p) const;
   void draw_dot(const point_t& a, const pixel_t& p) const;
   void draw_rect_outline(const rect_t& rect, const pixel_t& p) const;
-  void clear_screen(const pixel_t& p) const;
 
   void draw_texture(const texture_t& t, const int32_t x, const int32_t y) const;
   void draw_texture(const texture_t& t, const rect_t& rect) const;
+  void draw_texture(const texture_t& t,
+                    const rect_t& rect,
+                    const rect_t& clip) const;
 
   void draw_circle(const int32_t x,
                    const int32_t y,

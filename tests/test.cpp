@@ -4,6 +4,7 @@
 
 texture_t media1;
 texture_t media2;
+texture_t sprites;
 
 int32_t media2_x;
 int32_t media2_y;
@@ -55,6 +56,7 @@ private:
   {
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
+    sprites = load_image("assets/sprites.png");
 
     media2_x = (800 / 2) - (media2.w / 2);
     media2_y = (800 / 2) - (media2.h / 2);
@@ -69,8 +71,6 @@ private:
 
   void on_update(void*) override
   {
-    clear_screen(0x000000FF);
-
     for (uint32_t i = 0; i < 1000; i++) {
       const uint32_t x = (rand() % (width_in_pixels() - 2)) + 1;
       const uint32_t y = (rand() % (height_in_pixels() - 2)) + 1;
@@ -127,6 +127,10 @@ private:
       point_t p = {width() / 2 - 80 + (i * 10), height() / 2 - 80};
       draw_dot(p, 0xFFFFFFFF);
     }
+
+    // Draw a clip
+    draw_texture(sprites, {width() / 2, height() / 2, 50, 50},
+                 {0, 0, 100, 100});
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
@@ -195,7 +199,6 @@ private:
       texture_t T = create_text("D", p);
       draw_texture(T, 60, 213 - T.h);
     }
-
 
     int32_t y_draw_offset = 0;
     // Mouse

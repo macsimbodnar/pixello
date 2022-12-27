@@ -273,6 +273,12 @@ bool pixello::run()
         }
       }
 
+      // Clear
+      const pixel_t& bg_color = _config.background_color;
+      SDL_SetRenderDrawColor(_renderer, bg_color.r, bg_color.g, bg_color.b,
+                             bg_color.a);
+      SDL_RenderClear(_renderer);
+
       // Reset the viewport to entire window
       SDL_RenderSetViewport(_renderer, NULL);
 
@@ -364,16 +370,17 @@ void pixello::draw_dot(const point_t& a, const pixel_t& p) const
 }
 
 
-void pixello::clear_screen(const pixel_t& p) const
-{
-  SDL_SetRenderDrawColor(_renderer, p.r, p.g, p.b, p.a);
-  SDL_RenderClear(_renderer);
-}
-
-
 void pixello::draw_texture(const texture_t& t, const rect_t& rect) const
 {
   SDL_RenderCopy(_renderer, t.pointer(), NULL, (SDL_Rect*)&rect);
+}
+
+
+void pixello::draw_texture(const texture_t& t,
+                           const rect_t& rect,
+                           const rect_t& clip) const
+{
+  SDL_RenderCopy(_renderer, t.pointer(), (SDL_Rect*)&clip, (SDL_Rect*)&rect);
 }
 
 
