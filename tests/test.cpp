@@ -56,8 +56,8 @@ private:
 
   void on_click()
   {
+    mouse_set_FPS_mode(hide_mouse);
     hide_mouse = !hide_mouse;
-    show_mouse(hide_mouse);
     log("Click! " + std::to_string(hide_mouse));
   }
 

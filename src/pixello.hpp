@@ -351,6 +351,7 @@ public:
 
   bool is_mouse_in(const rect_t& rect) const;
   void show_mouse(const bool show) const;
+  void mouse_set_FPS_mode(const bool enable) const;
 
   button_t create_button(const rect_t& viewport,
                          const rect_t& button_rect,

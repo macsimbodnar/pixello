@@ -598,6 +598,13 @@ void pixello::on_click_button(button_t& b) const
 
 void pixello::show_mouse(const bool show) const
 {
-  int t = show ? SDL_ENABLE : SDL_DISABLE;
+  const int t = show ? SDL_ENABLE : SDL_DISABLE;
   SDL_ShowCursor(t);
+}
+
+
+void pixello::mouse_set_FPS_mode(const bool enable) const
+{
+  const SDL_bool b = enable ? SDL_TRUE : SDL_FALSE;
+  SDL_SetRelativeMouseMode(b);
 }
