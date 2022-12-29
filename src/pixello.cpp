@@ -594,3 +594,10 @@ void pixello::on_click_button(button_t& b) const
     b.hover = false;
   }
 }
+
+
+void pixello::show_mouse(const bool show) const
+{
+  int t = show ? SDL_ENABLE : SDL_DISABLE;
+  SDL_ShowCursor(t);
+}

@@ -342,6 +342,7 @@ public:
     _mouse_state.central_button.double_click = false;
   }
 
+
   inline uint32_t FPS() const { return _FPS; }
   inline uint64_t delta_time() const { return dt; }
 
@@ -349,6 +350,7 @@ public:
                             const pixel_t& color = {0x555555FF});
 
   bool is_mouse_in(const rect_t& rect) const;
+  void show_mouse(const bool show) const;
 
   button_t create_button(const rect_t& viewport,
                          const rect_t& button_rect,

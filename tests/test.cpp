@@ -21,6 +21,8 @@ int32_t holding_offset_y;
 uint32_t click_counter = 0;
 uint32_t double_click_counter = 0;
 
+bool hide_mouse = false;
+
 std::string pos_str(button_key_t::state_t s)
 {
   std::string res = "";
@@ -52,7 +54,12 @@ public:
 private:
   void log(const std::string& msg) override { std::cout << msg << std::endl; }
 
-  void on_click() { log("Click!"); }
+  void on_click()
+  {
+    hide_mouse = !hide_mouse;
+    show_mouse(hide_mouse);
+    log("Click! " + std::to_string(hide_mouse));
+  }
 
   void on_init(void*) override
   {
@@ -242,7 +249,7 @@ private:
     // Button
     button_t button =
         create_button(gray_viewport, {0, 100, 100, 30}, 0xFFFFFFFF, "Button",
-                      [&]() { log("Click!"); });
+                      [&]() { on_click(); });
 
     on_click_button(button);
     draw_button(button);
