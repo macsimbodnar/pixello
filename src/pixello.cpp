@@ -145,6 +145,8 @@ bool pixello::run()
 
       // Reset did mouse moved flag
       _mouse_state.did_mouse_moved = false;
+      _mouse_state.relative_x = 0;
+      _mouse_state.relative_y = 0;
 
       // POLL EVENTS
       while (SDL_PollEvent(&event)) {
@@ -226,12 +228,13 @@ bool pixello::run()
           } break;
 
           // MOUSE SECTION
-          case SDL_MOUSEMOTION:
-            SDL_GetMouseState(&_mouse_state.x, &_mouse_state.y);
-            SDL_GetRelativeMouseState(&_mouse_state.relative_x,
-                                      &_mouse_state.relative_y);
+          case SDL_MOUSEMOTION: {
+            _mouse_state.x = event.motion.x;
+            _mouse_state.y = event.motion.y;
+            _mouse_state.relative_x = event.motion.xrel;
+            _mouse_state.relative_y = event.motion.yrel;
             _mouse_state.did_mouse_moved = true;
-            break;
+          } break;
 
           case SDL_MOUSEBUTTONDOWN:
             switch (event.button.button) {

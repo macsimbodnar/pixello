@@ -12,6 +12,8 @@ int32_t media2_y;
 sound_t sound;
 music_t music;
 
+int32_t x_clip_pos = 800 / 2;
+
 bool holding_icon;
 int32_t holding_offset_x;
 int32_t holding_offset_y;
@@ -128,9 +130,9 @@ private:
       draw_dot(p, 0xFFFFFFFF);
     }
 
-    // Draw a clip
-    draw_texture(sprites, {width() / 2, height() / 2, 50, 50},
-                 {0, 0, 100, 100});
+    // Draw a clip based on the mouse relative pos
+    x_clip_pos += mouse_state().relative_x * 2;
+    draw_texture(sprites, {x_clip_pos, height() / 2, 50, 50}, {0, 0, 100, 100});
 
     // Update media2 position if mouse current state button down
     const rect_t r = {media2_x, media2_y, media2.w, media2.h};
