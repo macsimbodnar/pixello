@@ -228,6 +228,8 @@ bool pixello::run()
           // MOUSE SECTION
           case SDL_MOUSEMOTION:
             SDL_GetMouseState(&_mouse_state.x, &_mouse_state.y);
+            SDL_GetRelativeMouseState(&_mouse_state.relative_x,
+                                      &_mouse_state.relative_y);
             _mouse_state.did_mouse_moved = true;
             break;
 

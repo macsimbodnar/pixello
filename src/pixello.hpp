@@ -198,6 +198,8 @@ struct mouse_t
 {
   int32_t x = 0;
   int32_t y = 0;
+  int32_t relative_x;
+  int32_t relative_y;
   bool did_mouse_moved = false;
 
   button_key_t left_button;
