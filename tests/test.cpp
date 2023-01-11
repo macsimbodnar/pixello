@@ -189,22 +189,21 @@ private:
     draw_texture(DT, 320 - DT.w, FPS.h + 2);
 
     // Print WASD KEYS
-    inputs_t inputs = inputs_state();
-    if (inputs.w.pressed) {
+    if (is_key_pressed(keycap_t::W)) {
       texture_t T = create_text("W", p);
       draw_texture(T, 0, 213 - T.h);
     }
-    if (inputs.s.pressed) {
+    if (is_key_pressed(keycap_t::S)) {
       texture_t T = create_text("S", p);
       draw_texture(T, 20, 213 - T.h);
     }
 
-    if (inputs.a.pressed) {
+    if (is_key_pressed(keycap_t::A)) {
       texture_t T = create_text("A", p);
       draw_texture(T, 40, 213 - T.h);
     }
 
-    if (inputs.d.pressed) {
+    if (is_key_pressed(keycap_t::D)) {
       texture_t T = create_text("D", p);
       draw_texture(T, 60, 213 - T.h);
     }
@@ -259,6 +258,9 @@ private:
       if (mouse_state().left_button.click) { play_sound(sound); }
       if (mouse_state().right_button.click) { music_do(music_t::PLAY, music); }
     }
+
+    // Check if we have to quit the game
+    if (is_key_pressed(keycap_t::ESC)) { stop(); }
   }
 };
 

@@ -6,6 +6,55 @@
 #include "SDL_render.h"
 #include "SDL_ttf.h"
 
+/*******************************************************************************
+ * CONSTANT VALUES
+ ******************************************************************************/
+// clang-format off
+constexpr SDL_Scancode KEYCAP_MAP[] = {
+  SDL_SCANCODE_ESCAPE,
+  SDL_SCANCODE_Q,
+  SDL_SCANCODE_W,
+  SDL_SCANCODE_E,
+  SDL_SCANCODE_R,
+  SDL_SCANCODE_T,
+  SDL_SCANCODE_Y,
+  SDL_SCANCODE_U,
+  SDL_SCANCODE_I,
+  SDL_SCANCODE_O,
+  SDL_SCANCODE_P,
+  SDL_SCANCODE_A,
+  SDL_SCANCODE_S,
+  SDL_SCANCODE_D,
+  SDL_SCANCODE_F,
+  SDL_SCANCODE_G,
+  SDL_SCANCODE_H,
+  SDL_SCANCODE_J,
+  SDL_SCANCODE_K,
+  SDL_SCANCODE_L,
+  SDL_SCANCODE_Z,
+  SDL_SCANCODE_X,
+  SDL_SCANCODE_C,
+  SDL_SCANCODE_V,
+  SDL_SCANCODE_B,
+  SDL_SCANCODE_N,
+  SDL_SCANCODE_M,
+  SDL_SCANCODE_KP_1,
+  SDL_SCANCODE_KP_2,
+  SDL_SCANCODE_KP_3,
+  SDL_SCANCODE_KP_4,
+  SDL_SCANCODE_KP_5,
+  SDL_SCANCODE_KP_6,
+  SDL_SCANCODE_KP_7,
+  SDL_SCANCODE_KP_8,
+  SDL_SCANCODE_KP_9,
+  SDL_SCANCODE_KP_0,
+  SDL_SCANCODE_LEFT,
+  SDL_SCANCODE_RIGHT,
+  SDL_SCANCODE_UP,
+  SDL_SCANCODE_DOWN
+};
+// clang-format on
+
 
 /*******************************************************************************
  * STRUCTS
@@ -55,6 +104,8 @@ void pixello::log(const std::string& msg)
 
 void pixello::init()
 {
+  _running = true;
+
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     throw init_exception("SDL could not initialize! SDL_Error: " +
@@ -131,14 +182,13 @@ bool pixello::run()
     init();
 
     SDL_Event event;
-    bool running = true;
     uint32_t FPS_counter = 0;
     uint64_t FPS_last_check = SDL_GetPerformanceCounter();
     uint64_t start = SDL_GetPerformanceCounter();
     /*************************************************************
      *                          MAIN LOOP                        *
      *************************************************************/
-    while (running) {
+    while (_running) {
       const uint64_t now = SDL_GetPerformanceCounter();
       dt = now - start;
       start = now;
@@ -152,80 +202,8 @@ bool pixello::run()
       while (SDL_PollEvent(&event)) {
         switch (event.type) {
           case SDL_QUIT:
-            running = false;
+            _running = false;
             break;
-
-          // KEY SECTION
-          case SDL_KEYDOWN: {
-            switch (event.key.keysym.scancode) {
-              case SDL_SCANCODE_ESCAPE:
-                running = false;
-                break;
-
-              case SDL_SCANCODE_A:
-                _inputs.a.pressed = true;
-                break;
-              case SDL_SCANCODE_D:
-                _inputs.d.pressed = true;
-                break;
-              case SDL_SCANCODE_W:
-                _inputs.w.pressed = true;
-                break;
-              case SDL_SCANCODE_S:
-                _inputs.s.pressed = true;
-                break;
-
-              case SDL_SCANCODE_UP:
-                _inputs.up.pressed = true;
-                break;
-              case SDL_SCANCODE_DOWN:
-                _inputs.down.pressed = true;
-                break;
-              case SDL_SCANCODE_LEFT:
-                _inputs.left.pressed = true;
-                break;
-              case SDL_SCANCODE_RIGHT:
-                _inputs.right.pressed = true;
-                break;
-
-              default:
-                break;
-            }
-          } break;
-
-          case SDL_KEYUP: {
-            switch (event.key.keysym.scancode) {
-              case SDL_SCANCODE_A:
-                _inputs.a.pressed = false;
-                break;
-              case SDL_SCANCODE_D:
-                _inputs.d.pressed = false;
-                break;
-              case SDL_SCANCODE_W:
-                _inputs.w.pressed = false;
-                break;
-              case SDL_SCANCODE_S:
-                _inputs.s.pressed = false;
-                break;
-
-              case SDL_SCANCODE_UP:
-                _inputs.up.pressed = false;
-                break;
-              case SDL_SCANCODE_DOWN:
-                _inputs.down.pressed = false;
-                break;
-              case SDL_SCANCODE_LEFT:
-                _inputs.left.pressed = false;
-                break;
-              case SDL_SCANCODE_RIGHT:
-                _inputs.right.pressed = false;
-                break;
-
-
-              default:
-                break;
-            }
-          } break;
 
           // MOUSE SECTION
           case SDL_MOUSEMOTION: {
@@ -607,4 +585,16 @@ void pixello::mouse_set_FPS_mode(const bool enable) const
 {
   const SDL_bool b = enable ? SDL_TRUE : SDL_FALSE;
   SDL_SetRelativeMouseMode(b);
+}
+
+
+bool pixello::is_key_pressed(const keycap_t k) const
+{
+  const int index = static_cast<int>(k);
+  const SDL_Scancode code = KEYCAP_MAP[index];
+  const Uint8* current_key_states = SDL_GetKeyboardState(NULL);
+
+  const bool result = static_cast<bool>(current_key_states[code]);
+
+  return result;
 }

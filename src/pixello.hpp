@@ -7,6 +7,53 @@
 #include <stdexcept>
 #include <string>
 
+/*******************************************************************************
+ * VALUES
+ ******************************************************************************/
+enum class keycap_t
+{
+  ESC,
+  Q,
+  W,
+  E,
+  R,
+  T,
+  Y,
+  U,
+  I,
+  O,
+  P,
+  A,
+  S,
+  D,
+  F,
+  G,
+  H,
+  J,
+  K,
+  L,
+  Z,
+  X,
+  C,
+  V,
+  B,
+  N,
+  M,
+  N1,
+  N2,
+  N3,
+  N4,
+  N5,
+  N6,
+  N7,
+  N8,
+  N9,
+  N0,
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN
+};
 
 /*******************************************************************************
  * EXCEPTIONS
@@ -216,20 +263,6 @@ struct key_input_t
 };
 
 
-struct inputs_t
-{
-  key_input_t a;
-  key_input_t d;
-  key_input_t w;
-  key_input_t s;
-
-  key_input_t left;
-  key_input_t right;
-  key_input_t up;
-  key_input_t down;
-};
-
-
 struct button_t
 {
   rect_t rect;
@@ -250,7 +283,7 @@ private:
   uint32_t _FPS = 0;
   uint64_t dt;  // time form the last frame
   mouse_t _mouse_state;
-  inputs_t _inputs;
+  bool _running = true;
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
@@ -330,7 +363,7 @@ public:
   inline int32_t width() const { return _config.window_w; }
   inline int32_t height() const { return _config.window_h; }
   inline mouse_t mouse_state() const { return _mouse_state; }
-  inline inputs_t inputs_state() const { return _inputs; }
+  bool is_key_pressed(const keycap_t k) const;
 
   inline void mouse_reset_clicks()
   {
@@ -345,6 +378,7 @@ public:
 
   inline uint32_t FPS() const { return _FPS; }
   inline uint64_t delta_time() const { return dt; }
+  inline void stop() { _running = false; }
 
   void set_current_viewport(const rect_t& rect,
                             const pixel_t& color = {0x555555FF});
