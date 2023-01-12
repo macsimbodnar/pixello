@@ -81,6 +81,81 @@ sdl_sound_wrapper_t::~sdl_sound_wrapper_t()
   }
 }
 
+simple_timer::simple_timer()
+{
+  start_ticks = 0;
+  paused_ticks = 0;
+
+  paused = false;
+  started = false;
+}
+
+void simple_timer::start()
+{
+  started = true;
+  paused = false;
+
+  // Get the current clock time
+  start_ticks = SDL_GetTicks64();
+  paused_ticks = 0;
+}
+
+void simple_timer::stop()
+{
+  started = false;
+  paused = false;
+  start_ticks = 0;
+  paused_ticks = 0;
+}
+
+void simple_timer::pause()
+{
+  // If the timer is running and isn't already paused
+  if (started && !paused) {
+    paused = true;
+
+    // Calculate the paused ticks
+    paused_ticks = SDL_GetTicks64() - start_ticks;
+    start_ticks = 0;
+  }
+}
+
+void simple_timer::restart()
+{
+  if (started) {
+    stop();
+    start();
+  }
+}
+
+void simple_timer::unpause()
+{
+  // If the timer is running and paused
+  if (started && paused) {
+    paused = false;
+
+    // Reset the starting ticks
+    start_ticks = SDL_GetTicks64() - paused_ticks;
+    paused_ticks = 0;
+  }
+}
+
+uint64_t simple_timer::get_ticks() const
+{
+  uint64_t time = 0;
+
+  if (started) {
+    if (paused) {
+      // Return the number of ticks when the timer was paused
+      time = paused_ticks;
+    } else {
+      // Return the current time minus the start time
+      time = SDL_GetTicks64() - start_ticks;
+    }
+  }
+
+  return time;
+}
 
 /*******************************************************************************
  * PIXELLO CLASS

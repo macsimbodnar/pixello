@@ -23,6 +23,8 @@ uint32_t double_click_counter = 0;
 
 bool hide_mouse = false;
 
+simple_timer timer;
+
 std::string pos_str(button_key_t::state_t s)
 {
   std::string res = "";
@@ -257,6 +259,28 @@ private:
     if (is_mouse_in(gray_viewport)) {
       if (mouse_state().left_button.click) { play_sound(sound); }
       if (mouse_state().right_button.click) { music_do(music_t::PLAY, music); }
+    }
+
+    if (timer.get_ticks() >= 5 * 1000) {
+      log("5s elapsed");
+      timer.restart();
+    }
+
+    if (is_key_pressed(keycap_t::T)) {
+      if (!timer.is_started()) { timer.start(); }
+    }
+
+    if (is_key_pressed(keycap_t::S)) {
+      if (timer.is_started()) { timer.stop(); }
+    }
+
+    if (is_key_pressed(keycap_t::P)) {
+      if (!timer.is_paused()) { timer.pause(); }
+    }
+
+
+    if (is_key_pressed(keycap_t::U)) {
+      if (timer.is_paused()) { timer.unpause(); }
     }
 
     // Check if we have to quit the game

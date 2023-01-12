@@ -274,6 +274,38 @@ struct button_t
   bool hover;
 };
 
+
+struct simple_timer
+{
+public:
+  simple_timer();
+
+  // The various clock actions
+  void start();
+  void stop();
+  void pause();
+  void unpause();
+  void restart();
+
+  // get timer's time
+  uint64_t get_ticks() const;
+
+  // Checks the status of the timer
+  inline bool is_started() const { return started; }
+  inline bool is_paused() const { return paused && started; }
+
+private:
+  // The clock time when the timer started in ms
+  uint64_t start_ticks;
+
+  // The ticks stored when the timer was paused
+  uint64_t paused_ticks;
+
+  // The timer status
+  bool paused;
+  bool started;
+};
+
 /*******************************************************************************
  * PIXELLO CLASS
  ******************************************************************************/
