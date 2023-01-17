@@ -252,6 +252,10 @@ struct mouse_t
   int relative_y;
   bool did_mouse_moved = false;
 
+  bool left_button_pressed = false;
+  bool central_button_pressed = false;
+  bool right_button_pressed = false;
+
   button_key_t left_button;
   button_key_t central_button;
   button_key_t right_button;

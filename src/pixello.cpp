@@ -275,6 +275,9 @@ bool pixello::run()
       _mouse_state.did_mouse_moved = false;
       _mouse_state.relative_x = 0;
       _mouse_state.relative_y = 0;
+      _mouse_state.central_button_pressed = false;
+      _mouse_state.left_button_pressed = false;
+      _mouse_state.right_button_pressed = false;
 
       // POLL EVENTS
       while (SDL_PollEvent(&event)) {
@@ -295,6 +298,7 @@ bool pixello::run()
           case SDL_MOUSEBUTTONDOWN:
             switch (event.button.button) {
               case SDL_BUTTON_LEFT:
+                _mouse_state.left_button_pressed = true;
                 _mouse_state.left_button.state = button_key_t::DOWN;
                 _mouse_state.left_button.click =
                     event.button.clicks == 1 ? true : false;
@@ -302,6 +306,7 @@ bool pixello::run()
                     event.button.clicks == 2 ? true : false;
                 break;
               case SDL_BUTTON_RIGHT:
+                _mouse_state.right_button_pressed = true;
                 _mouse_state.right_button.state = button_key_t::DOWN;
                 _mouse_state.right_button.click =
                     event.button.clicks == 1 ? true : false;
@@ -309,6 +314,7 @@ bool pixello::run()
                     event.button.clicks == 2 ? true : false;
                 break;
               case SDL_BUTTON_MIDDLE:
+                _mouse_state.central_button_pressed = true;
                 _mouse_state.central_button.state = button_key_t::DOWN;
                 _mouse_state.central_button.click =
                     event.button.clicks == 1 ? true : false;
