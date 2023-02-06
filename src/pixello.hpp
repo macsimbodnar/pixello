@@ -103,11 +103,39 @@ struct point_t
   int y;
 };
 
+bool operator==(const point_t& lhs, const point_t& rhs)
+{
+  bool result = (lhs.x == rhs.x && lhs.y == rhs.y);
+  return result;
+}
+
+bool operator!=(const point_t& lhs, const point_t& rhs)
+{
+  bool result = (lhs.x != rhs.x || lhs.y != rhs.y);
+  return result;
+}
+
+
 struct rect_t
 {
   int x, y;
   int w, h;
 };
+
+bool operator==(const rect_t& lhs, const rect_t& rhs)
+{
+  bool result =
+      (lhs.x == rhs.x && lhs.y == rhs.y && lhs.w == rhs.w && lhs.h == rhs.h);
+  return result;
+}
+
+bool operator!=(const rect_t& lhs, const rect_t& rhs)
+{
+  bool result =
+      (lhs.x != rhs.x || lhs.y != rhs.y || lhs.w != rhs.w || lhs.h != rhs.h);
+  return result;
+}
+
 
 struct pixel_t
 {
@@ -129,6 +157,19 @@ struct pixel_t
       : a(alpha), b(blue), g(green), r(red)
   {}
 };
+
+bool operator==(const pixel_t& lhs, const pixel_t& rhs)
+{
+  bool result = (lhs.n == rhs.n);
+  return result;
+}
+
+bool operator!=(const pixel_t& lhs, const pixel_t& rhs)
+{
+  bool result = (lhs.n != rhs.n);
+  return result;
+}
+
 
 struct sdl_texture_wrapper_t
 {
