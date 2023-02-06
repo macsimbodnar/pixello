@@ -23,6 +23,10 @@ uint32_t double_click_counter = 0;
 
 bool hide_mouse = false;
 
+float sound_volume = 1.0f;
+float music_volume = 1.0f;
+float global_volume = 1.0f;
+
 simple_timer timer;
 
 std::string pos_str(button_key_t::state_t s)
@@ -194,20 +198,38 @@ private:
     if (is_key_pressed(keycap_t::W)) {
       texture_t T = create_text("W", p);
       draw_texture(T, 0, 213 - T.h);
+      music_volume += 0.05;
+      set_music_volume(music_volume);
     }
     if (is_key_pressed(keycap_t::S)) {
       texture_t T = create_text("S", p);
       draw_texture(T, 20, 213 - T.h);
+      music_volume -= 0.05;
+      set_music_volume(music_volume);
     }
 
     if (is_key_pressed(keycap_t::A)) {
       texture_t T = create_text("A", p);
       draw_texture(T, 40, 213 - T.h);
+      sound_volume -= 0.05f;
+      set_sound_volume(sound_volume);
     }
 
     if (is_key_pressed(keycap_t::D)) {
       texture_t T = create_text("D", p);
       draw_texture(T, 60, 213 - T.h);
+      sound_volume += 0.05f;
+      set_sound_volume(sound_volume);
+    }
+
+    if (is_key_pressed(keycap_t::L)) {
+      global_volume += 0.05f;
+      set_master_volume(global_volume);
+    }
+
+    if (is_key_pressed(keycap_t::K)) {
+      global_volume -= 0.05f;
+      set_master_volume(global_volume);
     }
 
     int32_t y_draw_offset = 0;

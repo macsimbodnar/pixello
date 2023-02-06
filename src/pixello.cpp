@@ -488,6 +488,33 @@ void pixello::play_sound(const sound_t& sound) const
   Mix_PlayChannel(-1, sound.pointer(), 0);
 }
 
+void pixello::set_master_volume(const float value) const
+{
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_VolumeMusic(V);
+  (void)Mix_Volume(-1, V);
+}
+
+
+void pixello::set_music_volume(const float value) const
+{
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_VolumeMusic(V);
+}
+
+
+void pixello::set_sound_volume(const float value) const
+{
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_Volume(-1, V);
+}
+
 
 void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
 {

@@ -431,6 +431,10 @@ public:
 
   void music_do(const music_t::action_t action, const music_t& music) const;
   void play_sound(const sound_t& sound) const;
+  void set_master_volume(const float value) const;
+  void set_music_volume(const float value) const;
+  void set_sound_volume(const float value) const;
+
 
   texture_t load_image(const std::string& img_path) const;
   texture_t create_text(const std::string& text, const pixel_t& color) const;
