@@ -6,6 +6,8 @@
 #include "SDL_render.h"
 #include "SDL_ttf.h"
 
+// TODO: Check all return code from SDL and return an error in case of failure
+
 /*******************************************************************************
  * CONSTANT VALUES
  ******************************************************************************/
@@ -460,59 +462,66 @@ void pixello::draw_texture(const texture_t& t,
 }
 
 
-void pixello::music_do(const music_t::action_t action,
-                       const music_t& music) const
-{
-  switch (action) {
-    case music_t::PLAY:
-      Mix_PlayMusic(music.pointer(), -1);
-      break;
-
-    case music_t::PAUSE:
-      Mix_PausedMusic();
-      break;
-
-    case music_t::RESUME:
-      Mix_ResumeMusic();
-      break;
-
-    case music_t::STOP:
-      Mix_HaltMusic();
-      break;
-  }
-}
-
-
 void pixello::play_sound(const sound_t& sound) const
 {
-  Mix_PlayChannel(-1, sound.pointer(), 0);
+  (void)Mix_PlayChannel(-1, sound.pointer(), 0);
+}
+
+float pixello::set_sound_volume(const sound_t& sound, const float volume) const
+{
+  if (volume >= 1.0f || volume <= .0f) {
+    throw input_exception("Invalid volume value: " + STR(volume));
+  }
+
+  const int V = static_cast<int>(MIX_MAX_VOLUME * volume);
+  const int old_volume = Mix_VolumeChunk(sound.pointer(), V);
+
+  if (old_volume < 0 || old_volume > MIX_MAX_VOLUME) {
+    throw runtime_exception("Failed to configure the volume for the chunk");
+  }
+
+  // Normalizing the value
+  const float result = old_volume / static_cast<float>(MIX_MAX_VOLUME);
+  return result;
 }
 
 void pixello::set_master_volume(const float value) const
 {
-  // De-normalizing the value from range [0,1] to range [0, 128]
-  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+  if (value >= 1.0f || value <= .0f) {
+    throw input_exception("Invalid volume value: " + STR(value));
+  }
 
-  (void)Mix_VolumeMusic(V);
-  (void)Mix_Volume(-1, V);
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int volume = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_VolumeMusic(volume);
+  (void)Mix_Volume(-1, volume);
 }
 
 
 void pixello::set_music_volume(const float value) const
 {
-  // De-normalizing the value from range [0,1] to range [0, 128]
-  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+  if (value >= 1.0f || value <= .0f) {
+    throw input_exception("Invalid volume value: " + STR(value));
+  }
 
-  (void)Mix_VolumeMusic(V);
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int volume = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_VolumeMusic(volume);
 }
 
 
 void pixello::set_sound_volume(const float value) const
 {
-  // De-normalizing the value from range [0,1] to range [0, 128]
-  const int V = static_cast<int>(MIX_MAX_VOLUME * value);
+  if (value >= 1.0f || value <= .0f) {
+    throw input_exception("Invalid volume value: " + STR(value));
+  }
 
-  (void)Mix_Volume(-1, V);
+  // De-normalizing the value from range [0,1] to range [0, 128]
+  const int volume = static_cast<int>(MIX_MAX_VOLUME * value);
+
+  (void)Mix_Volume(-1, volume);
 }
 
 
@@ -525,6 +534,47 @@ void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
   SDL_Rect rect2 = {0, 0, rect.w, rect.h};
   SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
   SDL_RenderFillRect(_renderer, &rect2);
+}
+
+
+void pixello::play_music(const music_t& music) const
+{
+  const int result = Mix_PlayMusic(music.pointer(), -1);
+
+  if (result == -1) {
+    throw runtime_exception("Failed to play music: " +
+                            std::string(Mix_GetError()));
+  }
+}
+
+
+void pixello::pause_sounds() const
+{
+  Mix_Pause(-1);
+}
+
+
+void pixello::resume_sounds() const
+{
+  Mix_Resume(-1);
+}
+
+
+void pixello::pause_music() const
+{
+  Mix_PauseMusic();
+}
+
+
+void pixello::resume_music() const
+{
+  Mix_ResumeMusic();
+}
+
+
+void pixello::stop_music() const
+{
+  (void)Mix_HaltMusic();
 }
 
 

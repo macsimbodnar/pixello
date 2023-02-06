@@ -26,7 +26,7 @@ bool hide_mouse = false;
 float sound_volume = 1.0f;
 float music_volume = 1.0f;
 float global_volume = 1.0f;
-
+bool music_state = false;
 simple_timer timer;
 
 std::string pos_str(button_key_t::state_t s)
@@ -269,10 +269,21 @@ private:
 
     y_draw_offset += did_mouse_moved_texture.h;
 
+    set_sound_volume(sound, 0.5f);
+
     // Button
-    button_t button =
-        create_button(gray_viewport, {0, 100, 100, 30}, 0xFFFFFFFF, "Button",
-                      [&]() { on_click(); });
+    button_t button = create_button(gray_viewport, {0, 100, 100, 30},
+                                    0xFFFFFFFF, "Button", [&]() {
+                                      on_click();
+
+                                      if (music_state) {
+                                        pause_music();
+                                        music_state = !music_state;
+                                      } else {
+                                        resume_music();
+                                        music_state = !music_state;
+                                      }
+                                    });
 
     on_click_button(button);
     draw_button(button);
@@ -280,7 +291,10 @@ private:
     // Sound
     if (is_mouse_in(gray_viewport)) {
       if (mouse_state().left_button.click) { play_sound(sound); }
-      if (mouse_state().right_button.click) { music_do(music_t::PLAY, music); }
+      if (mouse_state().right_button.click) {
+        play_music(music);
+        music_state = true;
+      }
     }
 
     if (timer.get_ticks() >= 5 * 1000) {

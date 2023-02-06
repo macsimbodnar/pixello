@@ -79,6 +79,18 @@ public:
   load_exceptions(std::string msg) : pixello_exception(std::move(msg)) {}
 };
 
+class runtime_exception : public pixello_exception
+{
+public:
+  runtime_exception(std::string msg) : pixello_exception(std::move(msg)) {}
+};
+
+class input_exception : public pixello_exception
+{
+public:
+  input_exception(std::string msg) : pixello_exception(std::move(msg)) {}
+};
+
 
 // Forward declaration to avoid include sdl in this header
 struct SDL_Window;
@@ -213,14 +225,6 @@ struct sound_t
 
 struct music_t
 {
-  enum action_t
-  {
-    PLAY,
-    PAUSE,
-    RESUME,
-    STOP
-  };
-
   std::shared_ptr<sdl_sound_wrapper_t> _ptr;
 
   music_t() {}
@@ -429,8 +433,14 @@ public:
                    const int32_t r,
                    const pixel_t& color) const;
 
-  void music_do(const music_t::action_t action, const music_t& music) const;
+  void play_music(const music_t& music) const;
   void play_sound(const sound_t& sound) const;
+  float set_sound_volume(const sound_t& sound, const float volume) const;
+  void pause_sounds() const;
+  void resume_sounds() const;
+  void pause_music() const;
+  void resume_music() const;
+  void stop_music() const;
   void set_master_volume(const float value) const;
   void set_music_volume(const float value) const;
   void set_sound_volume(const float value) const;
