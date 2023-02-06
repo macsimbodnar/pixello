@@ -103,13 +103,13 @@ struct point_t
   int y;
 };
 
-bool operator==(const point_t& lhs, const point_t& rhs)
+inline bool operator==(const point_t& lhs, const point_t& rhs)
 {
   bool result = (lhs.x == rhs.x && lhs.y == rhs.y);
   return result;
 }
 
-bool operator!=(const point_t& lhs, const point_t& rhs)
+inline bool operator!=(const point_t& lhs, const point_t& rhs)
 {
   bool result = (lhs.x != rhs.x || lhs.y != rhs.y);
   return result;
@@ -122,14 +122,14 @@ struct rect_t
   int w, h;
 };
 
-bool operator==(const rect_t& lhs, const rect_t& rhs)
+inline bool operator==(const rect_t& lhs, const rect_t& rhs)
 {
   bool result =
       (lhs.x == rhs.x && lhs.y == rhs.y && lhs.w == rhs.w && lhs.h == rhs.h);
   return result;
 }
 
-bool operator!=(const rect_t& lhs, const rect_t& rhs)
+inline bool operator!=(const rect_t& lhs, const rect_t& rhs)
 {
   bool result =
       (lhs.x != rhs.x || lhs.y != rhs.y || lhs.w != rhs.w || lhs.h != rhs.h);
@@ -158,13 +158,13 @@ struct pixel_t
   {}
 };
 
-bool operator==(const pixel_t& lhs, const pixel_t& rhs)
+inline bool operator==(const pixel_t& lhs, const pixel_t& rhs)
 {
   bool result = (lhs.n == rhs.n);
   return result;
 }
 
-bool operator!=(const pixel_t& lhs, const pixel_t& rhs)
+inline bool operator!=(const pixel_t& lhs, const pixel_t& rhs)
 {
   bool result = (lhs.n != rhs.n);
   return result;
