@@ -204,6 +204,27 @@ struct texture_t
   inline SDL_Texture* pointer() const { return _ptr.get()->ptr; }
 };
 
+
+struct std_font_wrapper_t
+{
+  _TTF_Font* ptr = NULL;
+
+  std_font_wrapper_t() = delete;
+
+  std_font_wrapper_t(_TTF_Font* p) : ptr(p) {}
+  ~std_font_wrapper_t();
+};
+
+
+struct font_t
+{
+  std::shared_ptr<std_font_wrapper_t> _ptr;
+
+  font_t() {}
+  inline _TTF_Font* pointer() const { return _ptr.get()->ptr; }
+};
+
+
 struct sdl_sound_wrapper_t
 {
   _Mix_Music* music_ptr = NULL;
@@ -246,18 +267,9 @@ struct config_t
   int32_t width_in_pixels;
   int32_t height_in_pixels;
 
-  std::string font_path;
-  int32_t font_size;
-
   pixel_t background_color;
 
-  config_t(uint32_t ps,
-           uint32_t ww,
-           uint32_t wh,
-           std ::string wname,
-           float Hz,
-           std::string font,
-           int32_t font_s)
+  config_t(uint32_t ps, uint32_t ww, uint32_t wh, std::string wname, float Hz)
       : pixel_size(ps),
         window_w(ww),
         window_h(wh),
@@ -265,9 +277,7 @@ struct config_t
         target_fps(Hz),
         target_s_per_frame(1 / target_fps),
         width_in_pixels(window_w / pixel_size),
-        height_in_pixels(window_h / pixel_size),
-        font_path(std::move(font)),
-        font_size(font_s)
+        height_in_pixels(window_h / pixel_size)
   {
     if (pixel_size < 1) {
       pixel_size = 1;
@@ -321,7 +331,7 @@ struct button_t
   rect_t with_viewport;
   pixel_t color;
   texture_t text_texture;
-  rect_t text_rect;
+  point_t text_pos;
   std::function<void()> on_click;
   bool hover;
 };
@@ -371,7 +381,6 @@ private:
 
   SDL_Window* _window = NULL;
   SDL_Renderer* _renderer = NULL;
-  _TTF_Font* _font = NULL;
 
   config_t _config;
 
@@ -392,11 +401,8 @@ public:
           uint32_t wh,
           std ::string wname,
           float Hz,
-          std::string font,
-          int32_t font_s,
           void* external_data = nullptr)
-      : _config({1, ww, wh, wname, Hz, font, font_s}),
-        _external_data(external_data)
+      : _config({1, ww, wh, wname, Hz}), _external_data(external_data)
   {}
 
   pixello(uint32_t pixel_size,
@@ -404,11 +410,8 @@ public:
           uint32_t wh,
           std ::string wname,
           float Hz,
-          std::string font,
-          int32_t font_s,
           void* external_data = nullptr)
-      : _config({pixel_size, ww, wh, wname, Hz, font, font_s}),
-        _external_data(external_data)
+      : _config({pixel_size, ww, wh, wname, Hz}), _external_data(external_data)
   {}
 
   ~pixello();
@@ -446,8 +449,11 @@ public:
   void set_sound_volume(const float value) const;
 
 
+  font_t load_font(const std::string& path, const int size_in_pixels) const;
   texture_t load_image(const std::string& img_path) const;
-  texture_t create_text(const std::string& text, const pixel_t& color) const;
+  texture_t create_text(const std::string& text,
+                        const pixel_t& color,
+                        const font_t& font) const;
   sound_t load_sound(const std::string& sound_path) const;
   music_t load_music(const std::string& music_path) const;
 
@@ -485,6 +491,7 @@ public:
                          const rect_t& button_rect,
                          const pixel_t button_color,
                          const std::string& button_text,
+                         const font_t& font,
                          const std::function<void()> on_click) const;
 
   void draw_button(const button_t& b) const;

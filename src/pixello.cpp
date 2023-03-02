@@ -73,6 +73,14 @@ sdl_texture_wrapper_t::~sdl_texture_wrapper_t()
   }
 }
 
+std_font_wrapper_t::~std_font_wrapper_t()
+{
+  if (ptr) {
+    TTF_CloseFont(ptr);
+    ptr = NULL;
+  }
+}
+
 sdl_sound_wrapper_t::~sdl_sound_wrapper_t()
 {
   if (music_ptr) {
@@ -168,7 +176,6 @@ uint64_t simple_timer::get_ticks() const
 
 pixello::~pixello()
 {
-  if (_font) { TTF_CloseFont(_font); }
   if (_renderer) { SDL_DestroyRenderer(_renderer); }
   if (_window) { SDL_DestroyWindow(_window); }
 
@@ -233,16 +240,6 @@ void pixello::init()
   if (_renderer == NULL) {
     throw init_exception("Failed to create a window renderer! SDL_Error: " +
                          std::string(SDL_GetError()));
-  }
-
-  // Load the font id required
-  if (_config.font_path.empty() == false) {
-    _font = TTF_OpenFont(_config.font_path.c_str(), _config.font_size);
-
-    if (_font == NULL) {
-      throw init_exception("Failed to load the font! SDL_Error: " +
-                           std::string(TTF_GetError()));
-    }
   }
 
   // Initialize renderer color
@@ -597,12 +594,17 @@ texture_t pixello::load_image(const std::string& img_path) const
 
 
 texture_t pixello::create_text(const std::string& text,
-                               const pixel_t& color) const
+                               const pixel_t& color,
+                               const font_t& font) const
 {
   const SDL_Color c = {color.r, color.g, color.b, color.a};
 
+  TTF_Font* font_ptr = font.pointer();
+
+  if (font_ptr == NULL) { throw runtime_exception("Used font is not loaded"); }
+
   // Render text surface
-  SDL_Surface* txt_surface = TTF_RenderText_Solid(_font, text.c_str(), c);
+  SDL_Surface* txt_surface = TTF_RenderText_Solid(font_ptr, text.c_str(), c);
 
   if (txt_surface == NULL) {
     throw load_exceptions("Failed to generate the text surface: " + text +
@@ -688,6 +690,7 @@ button_t pixello::create_button(const rect_t& viewport,
                                 const rect_t& button_rect,
                                 const pixel_t button_color,
                                 const std::string& button_text,
+                                const font_t& font,
                                 const std::function<void()> on_click) const
 {
   button_t button;
@@ -695,18 +698,16 @@ button_t pixello::create_button(const rect_t& viewport,
   button.color = button_color;
   button.rect = button_rect;
   button.on_click = on_click;
-  button.text_texture = create_text(button_text, 0x000000FF);
+  button.text_texture = create_text(button_text, 0x000000FF, font);
 
   button.with_viewport.w = button_rect.w;
   button.with_viewport.h = button_rect.h;
   button.with_viewport.x = button_rect.x + viewport.x;
   button.with_viewport.y = button_rect.y + viewport.y;
 
-  button.text_rect.w = button.text_texture.w;
-  button.text_rect.h = button.text_texture.h;
-  button.text_rect.x =
+  button.text_pos.x =
       button_rect.x + ((button_rect.w - button.text_texture.w) / 2);
-  button.text_rect.y =
+  button.text_pos.y =
       button_rect.y + ((button_rect.h - button.text_texture.h) / 2);
 
   return button;
@@ -718,7 +719,7 @@ void pixello::draw_button(const button_t& b) const
   draw_rect(b.rect, b.color);
   if (b.hover) { draw_rect(b.rect, 0xAAAAAA33); }
 
-  draw_texture(b.text_texture, b.text_rect);
+  draw_texture(b.text_texture, b.text_pos.x, b.text_pos.y);
 }
 
 
@@ -758,4 +759,34 @@ bool pixello::is_key_pressed(const keycap_t k) const
   const bool result = static_cast<bool>(current_key_states[code]);
 
   return result;
+}
+
+
+font_t pixello::load_font(const std::string& path,
+                          const int size_in_pixels) const
+{
+  if (path.empty()) {
+    throw input_exception("Trying to load a font but the path is empty");
+  }
+
+  if (size_in_pixels < 1) {
+    throw input_exception("Invalid value for font size: " +
+                          STR(size_in_pixels));
+  }
+
+  // Load the font id required
+  TTF_Font* f = TTF_OpenFont(path.c_str(), size_in_pixels);
+
+  if (f == NULL) {
+    throw init_exception("Failed to load the font! SDL_Error: " +
+                         std::string(TTF_GetError()));
+  }
+
+  // Set the anti-aliasing
+  TTF_SetFontHinting(f, TTF_HINTING_LIGHT);
+
+  font_t font;
+  font._ptr = std::make_shared<std_font_wrapper_t>(f);
+
+  return font;
 }

@@ -12,6 +12,9 @@ int32_t media2_y;
 sound_t sound;
 music_t music;
 
+font_t font;
+font_t font_2;
+
 int32_t x_clip_pos = 800 / 2;
 
 bool holding_icon;
@@ -47,15 +50,7 @@ std::string pos_str(button_key_t::state_t s)
 class pixel : public pixello
 {
 public:
-  pixel()
-      : pixello(20,
-                800,
-                800,
-                "Test pixello",
-                60,
-                "assets/font/PressStart2P.ttf",
-                10)
-  {}
+  pixel() : pixello(20, 800, 800, "Test pixello", 60) {}
 
 private:
   void log(const std::string& msg) override { std::cout << msg << std::endl; }
@@ -69,6 +64,8 @@ private:
 
   void on_init(void*) override
   {
+    font = load_font("assets/font/PressStart2P.ttf", 10);
+    font_2 = load_font("assets/font/PressStart2P.ttf", 20);
     media1 = load_image("assets/sample_640x426.bmp");
     media2 = load_image("assets/Chess_klt60.png");
     sprites = load_image("assets/sprites.png");
@@ -186,37 +183,41 @@ private:
 
     // PRINT FPS
     uint32_t fps = FPS();
-    texture_t FPS = create_text("FPS: " + STR(fps), p);
+    texture_t FPS = create_text("FPS: " + STR(fps), p, font);
     draw_texture(FPS, 320 - FPS.w, 0);
 
     // Print Delta T
     uint64_t dt = delta_time();
-    texture_t DT = create_text("DT: " + STR(dt), p);
+    texture_t DT = create_text("DT: " + STR(dt), p, font);
     draw_texture(DT, 320 - DT.w, FPS.h + 2);
+
+    // Print FOnt 2
+    texture_t f2 = create_text("Font 2", p, font_2);
+    draw_texture(f2, 320 - f2.w, f2.h + 6);
 
     // Print WASD KEYS
     if (is_key_pressed(keycap_t::W)) {
-      texture_t T = create_text("W", p);
+      texture_t T = create_text("W", p, font);
       draw_texture(T, 0, 213 - T.h);
       music_volume += 0.05;
       set_music_volume(music_volume);
     }
     if (is_key_pressed(keycap_t::S)) {
-      texture_t T = create_text("S", p);
+      texture_t T = create_text("S", p, font);
       draw_texture(T, 20, 213 - T.h);
       music_volume -= 0.05;
       set_music_volume(music_volume);
     }
 
     if (is_key_pressed(keycap_t::A)) {
-      texture_t T = create_text("A", p);
+      texture_t T = create_text("A", p, font);
       draw_texture(T, 40, 213 - T.h);
       sound_volume -= 0.05f;
       set_sound_volume(sound_volume);
     }
 
     if (is_key_pressed(keycap_t::D)) {
-      texture_t T = create_text("D", p);
+      texture_t T = create_text("D", p, font);
       draw_texture(T, 60, 213 - T.h);
       sound_volume += 0.05f;
       set_sound_volume(sound_volume);
@@ -236,13 +237,13 @@ private:
     // Mouse
     mouse_t state = mouse_state();
     texture_t mouse_pos_texture =
-        create_text("X: " + STR(state.x) + " Y: " + STR(state.y), p);
+        create_text("X: " + STR(state.x) + " Y: " + STR(state.y), p, font);
     draw_texture(mouse_pos_texture, 0, y_draw_offset);
 
     y_draw_offset += mouse_pos_texture.h;
 
     texture_t left_button_key_texture =
-        create_text("MLB: " + pos_str(state.left_button.state), p);
+        create_text("MLB: " + pos_str(state.left_button.state), p, font);
     draw_texture(left_button_key_texture, 0, y_draw_offset);
 
     y_draw_offset += left_button_key_texture.h;
@@ -252,19 +253,19 @@ private:
     if (mouse_state().left_button.double_click) { ++double_click_counter; }
 
     texture_t click_counter_texture =
-        create_text("Clicks: " + STR(click_counter), p);
+        create_text("Clicks: " + STR(click_counter), p, font);
     draw_texture(click_counter_texture, 0, y_draw_offset);
 
     y_draw_offset += click_counter_texture.h;
 
     texture_t double_click_counter_texture =
-        create_text("Double clicks: " + STR(double_click_counter), p);
+        create_text("Double clicks: " + STR(double_click_counter), p, font);
     draw_texture(double_click_counter_texture, 0, y_draw_offset);
 
     y_draw_offset += double_click_counter_texture.h;
 
     texture_t did_mouse_moved_texture =
-        create_text("Moved: " + STR(mouse_state().did_mouse_moved), p);
+        create_text("Moved: " + STR(mouse_state().did_mouse_moved), p, font);
     draw_texture(did_mouse_moved_texture, 0, y_draw_offset);
 
     y_draw_offset += did_mouse_moved_texture.h;
@@ -273,7 +274,7 @@ private:
 
     // Button
     button_t button = create_button(gray_viewport, {0, 100, 100, 30},
-                                    0xFFFFFFFF, "Button", [&]() {
+                                    0xFFFFFFFF, "Button", font, [&]() {
                                       on_click();
 
                                       if (music_state) {
