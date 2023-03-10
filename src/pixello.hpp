@@ -2,7 +2,6 @@
 
 #include <inttypes.h>
 #include <exception>
-#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -328,12 +327,10 @@ struct key_input_t
 struct button_t
 {
   rect_t rect;
-  rect_t with_viewport;
-  pixel_t color;
-  texture_t text_texture;
+  pixel_t bg_color;
+  texture_t texture;
   point_t text_pos;
-  std::function<void()> on_click;
-  bool hover;
+  pixel_t hover_mask;
 };
 
 
@@ -480,20 +477,18 @@ public:
   inline uint64_t delta_time() const { return dt; }
   inline void stop() { _running = false; }
 
-  void set_current_viewport(const rect_t& rect,
-                            const pixel_t& color = {0x555555FF});
+  // void set_current_viewport(const rect_t& rect,
+  //                           const pixel_t& color = {0x555555FF});
 
   bool is_mouse_in(const rect_t& rect) const;
   void show_mouse(const bool show) const;
   void mouse_set_FPS_mode(const bool enable) const;
 
-  button_t create_button(const rect_t& viewport,
-                         const rect_t& button_rect,
-                         const pixel_t button_color,
-                         const std::string& button_text,
-                         const font_t& font,
-                         const std::function<void()> on_click) const;
+  button_t create_button(const rect_t& rect,
+                         const pixel_t& bg_color,
+                         const texture_t& texture,
+                         const pixel_t hover_mask = 0xAAAAAA33) const;
 
   void draw_button(const button_t& b) const;
-  void on_click_button(button_t& b) const;
+  bool is_button_clicked(button_t& b) const;
 };

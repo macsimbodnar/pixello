@@ -346,7 +346,7 @@ bool pixello::run()
       SDL_RenderClear(_renderer);
 
       // Reset the viewport to entire window
-      SDL_RenderSetViewport(_renderer, NULL);
+      // SDL_RenderSetViewport(_renderer, NULL);
 
       // Set the alpha channel blend mode
       SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
@@ -522,16 +522,16 @@ void pixello::set_sound_volume(const float value) const
 }
 
 
-void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
-{
-  // Set viewport
-  SDL_RenderSetViewport(_renderer, (SDL_Rect*)&rect);
+// void pixello::set_current_viewport(const rect_t& rect, const pixel_t& c)
+// {
+//   // Set viewport
+//   SDL_RenderSetViewport(_renderer, (SDL_Rect*)&rect);
 
-  // Set background color for view port
-  SDL_Rect rect2 = {0, 0, rect.w, rect.h};
-  SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
-  SDL_RenderFillRect(_renderer, &rect2);
-}
+//   // Set background color for view port
+//   SDL_Rect rect2 = {0, 0, rect.w, rect.h};
+//   SDL_SetRenderDrawColor(_renderer, c.r, c.g, c.b, c.a);
+//   SDL_RenderFillRect(_renderer, &rect2);
+// }
 
 
 void pixello::play_music(const music_t& music) const
@@ -686,29 +686,18 @@ void pixello::draw_circle(const int32_t x,
 }
 
 
-button_t pixello::create_button(const rect_t& viewport,
-                                const rect_t& button_rect,
-                                const pixel_t button_color,
-                                const std::string& button_text,
-                                const font_t& font,
-                                const std::function<void()> on_click) const
+button_t pixello::create_button(const rect_t& rect,
+                                const pixel_t& bg_color,
+                                const texture_t& texture,
+                                const pixel_t hover_mask) const
 {
   button_t button;
-  button.hover = false;
-  button.color = button_color;
-  button.rect = button_rect;
-  button.on_click = on_click;
-  button.text_texture = create_text(button_text, 0x000000FF, font);
-
-  button.with_viewport.w = button_rect.w;
-  button.with_viewport.h = button_rect.h;
-  button.with_viewport.x = button_rect.x + viewport.x;
-  button.with_viewport.y = button_rect.y + viewport.y;
-
-  button.text_pos.x =
-      button_rect.x + ((button_rect.w - button.text_texture.w) / 2);
-  button.text_pos.y =
-      button_rect.y + ((button_rect.h - button.text_texture.h) / 2);
+  button.bg_color = bg_color;
+  button.rect = rect;
+  button.texture = texture;
+  button.hover_mask = hover_mask;
+  button.text_pos = {rect.x + ((rect.w - texture.w) / 2),
+                     rect.y + ((rect.h - texture.h) / 2)};
 
   return button;
 }
@@ -716,23 +705,21 @@ button_t pixello::create_button(const rect_t& viewport,
 
 void pixello::draw_button(const button_t& b) const
 {
-  draw_rect(b.rect, b.color);
-  if (b.hover) { draw_rect(b.rect, 0xAAAAAA33); }
+  draw_rect(b.rect, b.bg_color);
 
-  draw_texture(b.text_texture, b.text_pos.x, b.text_pos.y);
+  if (is_mouse_in(b.rect)) { draw_rect(b.rect, 0xAAAAAA33); }
+
+  draw_texture(b.texture, b.text_pos.x, b.text_pos.y);
 }
 
 
-void pixello::on_click_button(button_t& b) const
+bool pixello::is_button_clicked(button_t& b) const
 {
   const auto mouse = mouse_state();
 
-  if (is_mouse_in(b.with_viewport)) {
-    b.hover = true;
-    if (mouse.left_button.click) { b.on_click(); }
-  } else {
-    b.hover = false;
-  }
+  if (is_mouse_in(b.rect) && mouse.left_button.click) { return true; }
+
+  return false;
 }
 
 
