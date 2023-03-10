@@ -686,40 +686,36 @@ void pixello::draw_circle(const int32_t x,
 }
 
 
-button_t pixello::create_button(const rect_t& rect,
+button_t pixello::create_button(const int32_t w,
+                                const int32_t h,
                                 const pixel_t& bg_color,
                                 const texture_t& texture,
                                 const pixel_t hover_mask) const
 {
   button_t button;
   button.bg_color = bg_color;
-  button.rect = rect;
+  button.w = w;
+  button.h = h;
   button.texture = texture;
   button.hover_mask = hover_mask;
-  button.text_pos = {rect.x + ((rect.w - texture.w) / 2),
-                     rect.y + ((rect.h - texture.h) / 2)};
 
   return button;
 }
 
 
-void pixello::draw_button(const button_t& b) const
+void pixello::draw_button(const int32_t x,
+                          const int32_t y,
+                          const button_t& b) const
 {
-  draw_rect(b.rect, b.bg_color);
+  const rect_t button_rect = {x, y, b.w, b.h};
 
-  if (is_mouse_in(b.rect)) { draw_rect(b.rect, 0xAAAAAA33); }
+  draw_rect(button_rect, b.bg_color);
 
-  draw_texture(b.texture, b.text_pos.x, b.text_pos.y);
-}
+  if (is_mouse_in(button_rect)) { draw_rect(button_rect, b.hover_mask); }
 
-
-bool pixello::is_button_clicked(button_t& b) const
-{
-  const auto mouse = mouse_state();
-
-  if (is_mouse_in(b.rect) && mouse.left_button.click) { return true; }
-
-  return false;
+  const point_t texture_pos = {x + ((b.w - b.texture.w) / 2),
+                               y + ((b.h - b.texture.h) / 2)};
+  draw_texture(b.texture, texture_pos.x, texture_pos.y);
 }
 
 
