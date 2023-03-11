@@ -696,8 +696,8 @@ button_t pixello::create_button(const int32_t w,
   button.bg_color = bg_color;
   button.w = w;
   button.h = h;
-  button.texture = texture;
   button.hover_mask = hover_mask;
+  button.texture = texture;
 
   return button;
 }
@@ -715,7 +715,8 @@ void pixello::draw_button(const int32_t x,
 
   const point_t texture_pos = {x + ((b.w - b.texture.w) / 2),
                                y + ((b.h - b.texture.h) / 2)};
-  draw_texture(b.texture, texture_pos.x, texture_pos.y);
+
+  draw_texture(b.texture, button_rect);
 }
 
 
