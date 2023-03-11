@@ -716,6 +716,19 @@ void pixello::draw_button(const int32_t x,
   const point_t texture_pos = {x + ((b.w - b.texture.w) / 2),
                                y + ((b.h - b.texture.h) / 2)};
 
+  draw_texture(b.texture, texture_pos.x, texture_pos.y);
+}
+
+void pixello::draw_button_with_icon(const int32_t x,
+                                    const int32_t y,
+                                    const button_t& b) const
+{
+  const rect_t button_rect = {x, y, b.w, b.h};
+
+  draw_rect(button_rect, b.bg_color);
+
+  if (is_mouse_in(button_rect)) { draw_rect(button_rect, b.hover_mask); }
+
   draw_texture(b.texture, button_rect);
 }
 

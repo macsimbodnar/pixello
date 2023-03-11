@@ -491,4 +491,7 @@ public:
                          const pixel_t hover_mask = 0xAAAAAA33) const;
 
   void draw_button(const int32_t x, const int32_t y, const button_t& b) const;
+  void draw_button_with_icon(const int32_t x,
+                             const int32_t y,
+                             const button_t& b) const;
 };
