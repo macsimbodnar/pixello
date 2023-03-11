@@ -326,8 +326,7 @@ struct key_input_t
 
 struct button_t
 {
-  int32_t w;
-  int32_t h;
+  rect_t rect;
   pixel_t bg_color;
   texture_t texture;
   pixel_t hover_mask;
@@ -484,14 +483,11 @@ public:
   void show_mouse(const bool show) const;
   void mouse_set_FPS_mode(const bool enable) const;
 
-  button_t create_button(const int32_t w,
-                         const int32_t h,
+  button_t create_button(const rect_t& rect,
                          const pixel_t& bg_color,
                          const texture_t& texture,
                          const pixel_t hover_mask = 0xAAAAAA33) const;
 
-  void draw_button(const int32_t x, const int32_t y, const button_t& b) const;
-  void draw_button_with_icon(const int32_t x,
-                             const int32_t y,
-                             const button_t& b) const;
+  void draw_button(const button_t& b) const;
+  void draw_button_with_icon(const button_t& b) const;
 };

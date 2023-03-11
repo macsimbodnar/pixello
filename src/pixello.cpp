@@ -686,16 +686,14 @@ void pixello::draw_circle(const int32_t x,
 }
 
 
-button_t pixello::create_button(const int32_t w,
-                                const int32_t h,
+button_t pixello::create_button(const rect_t& rect,
                                 const pixel_t& bg_color,
                                 const texture_t& texture,
                                 const pixel_t hover_mask) const
 {
   button_t button;
+  button.rect = rect;
   button.bg_color = bg_color;
-  button.w = w;
-  button.h = h;
   button.hover_mask = hover_mask;
   button.texture = texture;
 
@@ -703,27 +701,25 @@ button_t pixello::create_button(const int32_t w,
 }
 
 
-void pixello::draw_button(const int32_t x,
-                          const int32_t y,
-                          const button_t& b) const
+void pixello::draw_button(const button_t& b) const
 {
-  const rect_t button_rect = {x, y, b.w, b.h};
+  const rect_t& button_rect = b.rect;
 
   draw_rect(button_rect, b.bg_color);
 
   if (is_mouse_in(button_rect)) { draw_rect(button_rect, b.hover_mask); }
 
-  const point_t texture_pos = {x + ((b.w - b.texture.w) / 2),
-                               y + ((b.h - b.texture.h) / 2)};
+  const point_t texture_pos = {
+      button_rect.x + ((button_rect.w - b.texture.w) / 2),
+      button_rect.y + ((button_rect.h - b.texture.h) / 2)};
 
   draw_texture(b.texture, texture_pos.x, texture_pos.y);
 }
 
-void pixello::draw_button_with_icon(const int32_t x,
-                                    const int32_t y,
-                                    const button_t& b) const
+
+void pixello::draw_button_with_icon(const button_t& b) const
 {
-  const rect_t button_rect = {x, y, b.w, b.h};
+  const rect_t& button_rect = b.rect;
 
   draw_rect(button_rect, b.bg_color);
 

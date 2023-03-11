@@ -281,8 +281,8 @@ private:
     // Button
     rect_t button_rect = {gray_viewport.x + 0, gray_viewport.y + 100, 100, 30};
     texture_t button_text = create_text("Button", 0x000000FF, font);
-    button_t button = create_button(button_rect.w, button_rect.h, 0xFFFFFFFF,
-                                    button_text, 0x111111FF);
+    button_t button =
+        create_button(button_rect, 0xFFFFFFFF, button_text, 0x111111FF);
 
     if (is_mouse_in(button_rect) && mouse_state().left_button.click) {
       on_click();
@@ -296,7 +296,7 @@ private:
       }
     }
 
-    draw_button(button_rect.x, button_rect.y, button);
+    draw_button(button);
 
     // Sound
     if (is_mouse_in(gray_viewport)) {
