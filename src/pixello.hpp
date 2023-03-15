@@ -472,6 +472,7 @@ public:
   }
 
 
+  uint64_t get_ticks() const;
   inline uint32_t FPS() const { return _FPS; }
   inline uint64_t delta_time() const { return dt; }
   inline void stop() { _running = false; }

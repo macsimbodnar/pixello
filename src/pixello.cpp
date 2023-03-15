@@ -783,3 +783,10 @@ font_t pixello::load_font(const std::string& path,
 
   return font;
 }
+
+
+uint64_t pixello::get_ticks() const
+{
+  const uint64_t time = SDL_GetTicks64();
+  return time;
+}
