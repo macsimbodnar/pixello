@@ -852,3 +852,9 @@ void pixello::stop_text_input()
     SDL_StopTextInput();
   }
 }
+
+
+void pixello::set_to_clipboard(const std::string& text)
+{
+  SDL_SetClipboardText(text.c_str());
+}

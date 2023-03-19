@@ -512,4 +512,6 @@ public:
     return _input_text;
   }
   inline bool is_text_input_enabled() const { return _text_input_on; }
+  void set_to_clipboard(const std::string& text);
+  inline void clear_input_text_buffer() { _input_text.clear(); }
 };
