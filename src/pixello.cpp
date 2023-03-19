@@ -278,9 +278,12 @@ bool pixello::run()
       _mouse_state.left_button_pressed = false;
       _mouse_state.right_button_pressed = false;
 
+      _render_input_text = false;
+
       // POLL EVENTS
       while (SDL_PollEvent(&event)) {
         switch (event.type) {
+          // QUIT
           case SDL_QUIT:
             _running = false;
             break;
@@ -336,6 +339,47 @@ bool pixello::run()
                 break;
             }
             break;
+
+            // Special text input event
+          case SDL_TEXTINPUT: {
+            // Not copy or pasting
+            if (!(SDL_GetModState() & KMOD_CTRL &&
+                  (event.text.text[0] == 'c' || event.text.text[0] == 'C' ||
+                   event.text.text[0] == 'v' || event.text.text[0] == 'V'))) {
+              // Append character
+              _input_text += event.text.text;
+              _render_input_text = true;
+            }
+          }
+        }
+
+
+        // TEXT INPUT SPECIAL CASES
+        if (_text_input_on) {
+          switch (event.type) {
+            case SDL_KEYDOWN: {
+              // Handle backspace
+              if (event.key.keysym.sym == SDLK_BACKSPACE &&
+                  _input_text.length() > 0) {
+                // lop off character
+                _input_text.pop_back();
+                _render_input_text = true;
+              }
+              // Handle copy
+              else if (event.key.keysym.sym == SDLK_c &&
+                       SDL_GetModState() & KMOD_CTRL) {
+                SDL_SetClipboardText(_input_text.c_str());
+              }
+              // Handle paste
+              else if (event.key.keysym.sym == SDLK_v &&
+                       SDL_GetModState() & KMOD_CTRL) {
+                char* buffer = SDL_GetClipboardText();
+                _input_text = buffer;
+                SDL_free(buffer);
+                _render_input_text = true;
+              }
+            }
+          }
         }
       }
 
@@ -789,4 +833,22 @@ uint64_t pixello::get_ticks() const
 {
   const uint64_t time = SDL_GetTicks64();
   return time;
+}
+
+
+void pixello::start_text_input()
+{
+  if (!_text_input_on) {
+    SDL_StartTextInput();
+    _text_input_on = true;
+  }
+}
+
+
+void pixello::stop_text_input()
+{
+  if (_text_input_on) {
+    _text_input_on = false;
+    SDL_StopTextInput();
+  }
 }

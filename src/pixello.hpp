@@ -201,6 +201,12 @@ struct texture_t
 
   texture_t() {}
   inline SDL_Texture* pointer() const { return _ptr.get()->ptr; }
+  inline bool is_valid() const
+  {
+    if (_ptr) { return true; }
+
+    return false;
+  }
 };
 
 
@@ -382,6 +388,11 @@ private:
 
   void* _external_data = nullptr;
 
+  bool _text_input_on = false;
+  const std::string _empty_input_text = " ";
+  std::string _input_text;
+  bool _render_input_text = false;
+
   void init();
 
 protected:
@@ -472,7 +483,7 @@ public:
   }
 
 
-  uint64_t get_ticks() const;
+  uint64_t get_ticks() const;  // ms
   inline uint32_t FPS() const { return _FPS; }
   inline uint64_t delta_time() const { return dt; }
   inline void stop() { _running = false; }
@@ -491,4 +502,14 @@ public:
 
   void draw_button(const button_t& b) const;
   void draw_button_with_icon(const button_t& b) const;
+
+  void start_text_input();
+  void stop_text_input();
+  inline bool should_render_text() const { return _render_input_text; }
+  inline const std::string& get_input_text() const
+  {
+    if (_input_text.empty()) { return _empty_input_text; }
+    return _input_text;
+  }
+  inline bool is_text_input_enabled() const { return _text_input_on; }
 };

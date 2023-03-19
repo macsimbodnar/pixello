@@ -32,6 +32,8 @@ float global_volume = 1.0f;
 bool music_state = false;
 simple_timer timer;
 
+texture_t input_text_texture;
+
 std::string pos_str(button_key_t::state_t s)
 {
   std::string res = "";
@@ -46,6 +48,15 @@ std::string pos_str(button_key_t::state_t s)
 
   return res;
 }
+
+
+void sanitize_volume(float& vol)
+{
+  if (vol > 1.0f) { vol = 1.0f; }
+
+  if (vol < .000f) { vol = .0f; }
+}
+
 
 class pixel : public pixello
 {
@@ -201,12 +212,14 @@ private:
       texture_t T = create_text("W", p, font);
       draw_texture(T, gray_viewport.x + 0, gray_viewport.y + 213 - T.h);
       music_volume += 0.05;
+      sanitize_volume(music_volume);
       set_music_volume(music_volume);
     }
     if (is_key_pressed(keycap_t::S)) {
       texture_t T = create_text("S", p, font);
       draw_texture(T, gray_viewport.x + 20, gray_viewport.y + 213 - T.h);
       music_volume -= 0.05;
+      sanitize_volume(music_volume);
       set_music_volume(music_volume);
     }
 
@@ -214,6 +227,7 @@ private:
       texture_t T = create_text("A", p, font);
       draw_texture(T, gray_viewport.x + 40, gray_viewport.y + 213 - T.h);
       sound_volume -= 0.05f;
+      sanitize_volume(sound_volume);
       set_sound_volume(sound_volume);
     }
 
@@ -221,17 +235,42 @@ private:
       texture_t T = create_text("D", p, font);
       draw_texture(T, gray_viewport.x + 60, gray_viewport.y + 213 - T.h);
       sound_volume += 0.05f;
+      sanitize_volume(sound_volume);
       set_sound_volume(sound_volume);
     }
 
     if (is_key_pressed(keycap_t::L)) {
       global_volume += 0.05f;
+      sanitize_volume(global_volume);
       set_master_volume(global_volume);
     }
 
     if (is_key_pressed(keycap_t::K)) {
       global_volume -= 0.05f;
+      sanitize_volume(global_volume);
       set_master_volume(global_volume);
+    }
+
+    // Draw the input text field
+    const rect_t input_rect = {width() / 2 - 150, 100, 300, 40};
+    pixel_t input_filed_color;
+    if (is_mouse_in(input_rect)) {
+      input_filed_color = 0xFFFFFFFF;
+      start_text_input();
+    } else {
+      input_filed_color = 0x888888FF;
+      stop_text_input();
+    }
+
+    if (is_text_input_enabled() && should_render_text()) {
+      const std::string& text_to_render = get_input_text();
+      input_text_texture = create_text(text_to_render, 0x000000FF, font);
+    }
+
+    draw_rect(input_rect, input_filed_color);
+    if (input_text_texture.is_valid()) {
+      draw_texture(input_text_texture, input_rect.x + 2,
+                   input_rect.y + ((input_rect.h - input_text_texture.h) / 2));
     }
 
     int32_t y_draw_offset = 0;
