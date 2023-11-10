@@ -303,7 +303,7 @@ bool pixello::run()
                 _mouse_state.left_button_pressed = true;
                 _mouse_state.left_button.state = button_key_t::DOWN;
                 _mouse_state.left_button.click =
-                    event.button.clicks == 1 ? true : false;
+                    event.button.clicks > 0 ? true : false;
                 _mouse_state.left_button.double_click =
                     event.button.clicks == 2 ? true : false;
                 break;
@@ -311,7 +311,7 @@ bool pixello::run()
                 _mouse_state.right_button_pressed = true;
                 _mouse_state.right_button.state = button_key_t::DOWN;
                 _mouse_state.right_button.click =
-                    event.button.clicks == 1 ? true : false;
+                    event.button.clicks > 0 ? true : false;
                 _mouse_state.right_button.double_click =
                     event.button.clicks == 2 ? true : false;
                 break;
@@ -319,7 +319,7 @@ bool pixello::run()
                 _mouse_state.central_button_pressed = true;
                 _mouse_state.central_button.state = button_key_t::DOWN;
                 _mouse_state.central_button.click =
-                    event.button.clicks == 1 ? true : false;
+                    event.button.clicks > 0 ? true : false;
                 _mouse_state.central_button.double_click =
                     event.button.clicks == 2 ? true : false;
                 break;

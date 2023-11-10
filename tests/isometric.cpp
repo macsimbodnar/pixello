@@ -1,4 +1,6 @@
 #include <math.h>
+#include <algorithm>
+#include <vector>
 #include "pixello.hpp"
 
 constexpr int screen_w = 800;
@@ -6,14 +8,14 @@ constexpr int screen_h = 400;
 
 // Number of tiles in world
 constexpr int world_w = 20;
-constexpr int world_h = 20;
+constexpr int world_h = 10;
 
 // Size of single tile graphic
 constexpr int tile_w = 40;
 constexpr int tile_h = 20;
 
 // Where to place tile (0,0) on screen (in tile size steps)
-point_t origin = {5, 1};
+constexpr point_t map_render_offset = {200, 200};
 
 // Sprite that holds all imagery
 constexpr int sprite_w = 40;
@@ -24,30 +26,39 @@ font_t font;
 // Pointer to create 2D world array
 int world[world_h][world_w];
 
+constexpr int max_num_objects = 1024;
 
-point_t screen_to_isometric(const int x, const int y)
+
+point_t coord_screen_to_map(const point_t screen_coord)
 {
-  point_t result;
-  // result.x = (y / tile_h) + (x / tile_w);
-  // result.y = (y / tile_h) - (x / tile_w);
+  point_t tile_coord;
 
-  // const float x = _x;
-  // const float y = _y;
-  const int tile_w_half = tile_w / 2;
-  const int tile_h_half = tile_h / 2;
+  float sx, sy;
 
-  // result.x = floorf(0.5 * (x / tile_w_half + y / tile_h_half));
-  // result.y = floorf(0.5 * (-x / tile_w_half + y / tile_h_half));
-  int tile_x = x - 2 * y + tile_w_half;
-  int tile_y = x + 2 * y - tile_h_half;
+  sx = screen_coord.x - (tile_w / 2.0f);
+  sy = screen_coord.y - (tile_h / 2.0f);
 
-  tile_x /= tile_w;
-  tile_y /= tile_h;
+  sx -= map_render_offset.x;
+  sy -= map_render_offset.y;
 
-  result.x = tile_x;
-  result.y = tile_y;
+  tile_coord.x = static_cast<int>(roundf(((sx / tile_w) - (sy / tile_h))));
+  tile_coord.y = static_cast<int>(roundf(((sx / tile_w) + (sy / tile_h))));
 
-  return result;
+  return tile_coord;
+}
+
+
+point_t coord_map_to_screen(const point_t& map_cord)
+{
+  point_t iso_coord;
+
+  iso_coord.x = map_render_offset.x +
+                ((map_cord.x * tile_w / 2) + (map_cord.y * tile_w / 2));
+
+  iso_coord.y = map_render_offset.y +
+                ((map_cord.y * tile_h / 2) - (map_cord.x * tile_h / 2));
+
+  return iso_coord;
 }
 
 
@@ -71,18 +82,13 @@ private:
     int i = 0;
     for (auto& row : world) {
       for (auto& element : row) {
-        element = i % 6;
+        element = 0;
       }
       ++i;
     }
-  }
-
-  inline static point_t to_screen_pos(const point_t& p)
-  {
-    point_t res;
-    res.x = (origin.x * tile_w) + (p.x - p.y) * (tile_w / 2);
-    res.y = (origin.y * tile_h) + (p.x + p.y) * (tile_h / 2);
-    return res;
+    world[1][0] = 1;
+    world[2][0] = 2;
+    world[3][0] = 3;
   }
 
   void on_update(void*) override
@@ -95,25 +101,12 @@ private:
     }
 
     // Clear screen
-    draw_rect({0, 0, 800, 800}, 0xFFFFFFFF);
+    draw_rect({0, 0, screen_w, screen_h}, 0xFFFFFFFF);
 
-    // Get Mouse in world
-    const int mouse_x = mouse_state().x;
-    const int mouse_y = mouse_state().y;
-
-    // Work out active cell
-    const int active_cell_x = mouse_x / tile_w;
-    const int active_cell_y = mouse_y / tile_h;
-
-    const point_t selected_tile = screen_to_isometric(mouse_x, mouse_y);
-
-    // Work out mouse offset into cell
-    // const int offset_x = mouse_x % tile_w;
-    // const int offset_y = mouse_y % tile_h;
-
-    for (int y = 0; y < world_h; ++y) {
-      for (int x = 0; x < world_h; ++x) {
-        const point_t screen_pos = to_screen_pos({x, y});
+    // Draw in this order to draw first the objects that are more far away
+    for (int x = (world_w - 1); x > -1; --x) {
+      for (int y = 0; y < world_h; ++y) {
+        const point_t screen_pos = coord_map_to_screen({x, y});
 
         const int cell_elem = world[y][x];
         rect_t position;
@@ -209,21 +202,47 @@ private:
       }
     }
 
+
+    // Selected tile
+    const int mouse_x = mouse_state().x;
+    const int mouse_y = mouse_state().y;
+
+    const point_t selected_tile = coord_screen_to_map({mouse_x, mouse_y});
+    const point_t screen_selected_tile = coord_map_to_screen(selected_tile);
+
+    rect_t position;
+    rect_t sprite_crop;
+    position.x = screen_selected_tile.x;
+    position.y = screen_selected_tile.y;
+    position.w = tile_w;
+    position.h = tile_h;
+
+    sprite_crop.x = 0 * sprite_w;
+    sprite_crop.y = 0 * sprite_h;
+    sprite_crop.w = sprite_w;
+    sprite_crop.h = sprite_h;
+
+    draw_texture(sprites, position, sprite_crop);
+
     // Draw coordinates
     const texture_t mouse_coord_text = create_text(
         "Mouse: " + STR(mouse_x) + ", " + STR(mouse_y), 0x000000FF, font);
-
-    const texture_t cell_coord_text =
-        create_text("Cell: " + STR(active_cell_x) + ", " + STR(active_cell_y),
-                    0x000000FF, font);
 
     const texture_t tile_coord_text = create_text(
         "Tile: " + STR(selected_tile.x) + ", " + STR(selected_tile.y),
         0x000000FF, font);
 
     draw_texture(mouse_coord_text, 5, 5);
-    draw_texture(cell_coord_text, 5, 20);
-    draw_texture(tile_coord_text, 5, 35);
+    draw_texture(tile_coord_text, 5, 20);
+
+    // Change the tile
+    if (mouse_state().left_button.click) {
+      if (selected_tile.x < world_w && selected_tile.x >= 0 &&
+          selected_tile.y < world_h && selected_tile.y >= 0) {
+        const int current_val = world[selected_tile.y][selected_tile.x];
+        world[selected_tile.y][selected_tile.x] = (current_val + 1) % 6;
+      }
+    }
   }
 };
 
