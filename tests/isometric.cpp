@@ -15,7 +15,8 @@ constexpr int tile_w = 40;
 constexpr int tile_h = 20;
 
 // Where to place tile (0,0) on screen (in tile size steps)
-constexpr point_t map_render_offset = {200, 200};
+constexpr float scroll_speed = 0.0000007f;
+point_t map_render_offset = {200, 200};
 
 // Sprite that holds all imagery
 constexpr int sprite_w = 40;
@@ -25,8 +26,6 @@ font_t font;
 
 // Pointer to create 2D world array
 int world[world_h][world_w];
-
-constexpr int max_num_objects = 1024;
 
 
 point_t coord_screen_to_map(const point_t screen_coord)
@@ -98,6 +97,23 @@ private:
 
       // Check if we have to quit the game
       if (is_key_pressed(keycap_t::ESC)) { stop(); }
+
+      if (is_key_pressed(keycap_t::LEFT)) {
+        map_render_offset.x -=
+            static_cast<int>(floorf(scroll_speed * delta_time()));
+      }
+      if (is_key_pressed(keycap_t::RIGHT)) {
+        map_render_offset.x +=
+            static_cast<int>(floorf(scroll_speed * delta_time()));
+      }
+      if (is_key_pressed(keycap_t::UP)) {
+        map_render_offset.y -=
+            static_cast<int>(floorf(scroll_speed * delta_time()));
+      }
+      if (is_key_pressed(keycap_t::DOWN)) {
+        map_render_offset.y +=
+            static_cast<int>(floorf(scroll_speed * delta_time()));
+      }
     }
 
     // Clear screen
