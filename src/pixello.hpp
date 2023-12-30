@@ -487,6 +487,7 @@ public:
   inline uint32_t FPS() const { return _FPS; }
   inline uint64_t delta_time() const { return dt; }
   inline void stop() { _running = false; }
+  float get_performance_freq();
 
   // void set_current_viewport(const rect_t& rect,
   //                           const pixel_t& color = {0x555555FF});

@@ -200,10 +200,12 @@ void pixello::init()
   }
 
   // Set texture filtering to linear
-  if (SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1") == false) {
+  // if (SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1") == false) {
+  if (SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0") == false) {
     throw init_exception("Failed to setup the renderer: " +
                          std::string(SDL_GetError()));
   }
+
 
   // Init SDL IMG
   if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
@@ -857,4 +859,11 @@ void pixello::stop_text_input()
 void pixello::set_to_clipboard(const std::string& text)
 {
   SDL_SetClipboardText(text.c_str());
+}
+
+
+float pixello::get_performance_freq()
+{
+  float result = static_cast<float>(SDL_GetPerformanceFrequency());
+  return result;
 }
